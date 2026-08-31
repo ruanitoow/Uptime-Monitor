@@ -1,0 +1,44 @@
+.layout {
+  min-height: 100vh;
+  background: var(--background);
+}
+
+.workspace {
+  min-height: 100vh;
+  margin-left: 252px;
+}
+
+.main {
+  padding: 2.25rem 2rem 3rem;
+}
+
+.content {
+  width: min(1160px, 100%);
+  margin: 0 auto;
+}
+
+.backdrop {
+  display: none;
+}
+
+@media (max-width: 900px) {
+  .workspace {
+    margin-left: 0;
+  }
+
+  .backdrop {
+    position: fixed;
+    inset: 0;
+    z-index: 35;
+    display: block;
+    border: 0;
+    background: rgba(8, 11, 22, 0.48);
+    cursor: pointer;
+  }
+}
+
+@media (max-width: 620px) {
+  .main {
+    padding: 1.5rem 1rem 2.5rem;
+  }
+}

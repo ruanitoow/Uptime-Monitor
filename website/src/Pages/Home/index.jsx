@@ -9,7 +9,7 @@ import style from "./home.module.css";
 const stats = [
   { value: "99,99%", label: "Uptime monitorado" },
   { value: "24/7", label: "Verificações contínuas" },
-  { value: "142ms", label: "Latência de exemplo" },
+  { value: "67ms", label: "Latência de exemplo" },
   { value: "Instantâneo", label: "Alertas de incidentes" },
 ];
 

@@ -1,0 +1,93 @@
+.card {
+  width: min(100%, 430px);
+  padding: 2rem;
+  border: 1px solid var(--border);
+  border-radius: 24px;
+  background: var(--surface);
+  box-shadow: var(--shadow-md);
+}
+
+.heading h2 {
+  margin: 0;
+  font-size: 1.8rem;
+  letter-spacing: -0.035em;
+}
+
+.heading p {
+  margin: 0.55rem 0 0;
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+  line-height: 1.6;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin-top: 1.6rem;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+}
+
+.field span {
+  color: var(--text-primary);
+  font-size: 0.8rem;
+  font-weight: 700;
+}
+
+.field input {
+  width: 100%;
+  min-height: 48px;
+  padding: 0 0.9rem;
+  border: 1px solid var(--border);
+  border-radius: 11px;
+  outline: none;
+  color: var(--text-primary);
+  background: var(--surface-secondary);
+  transition: border-color 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+}
+
+.field input::placeholder {
+  color: var(--text-muted);
+}
+
+.field input:focus {
+  border-color: var(--primary);
+  background: var(--surface);
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--primary) 14%, transparent);
+}
+
+.submit {
+  min-height: 48px;
+  margin-top: 0.25rem;
+  border: 0;
+  border-radius: 11px;
+  color: #ffffff;
+  background: var(--gradient-primary);
+  box-shadow: 0 9px 24px rgba(79, 70, 229, 0.24);
+  font-weight: 800;
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.submit:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 13px 30px rgba(79, 70, 229, 0.3);
+}
+
+.footerText {
+  margin: 1.25rem 0 0;
+  color: var(--text-secondary);
+  font-size: 0.82rem;
+  text-align: center;
+}
+
+.footerText a {
+  color: var(--primary);
+  font-weight: 700;
+  text-decoration: none;
+}

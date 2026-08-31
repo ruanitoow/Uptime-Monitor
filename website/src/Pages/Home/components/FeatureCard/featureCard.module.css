@@ -1,0 +1,46 @@
+.card {
+  padding: 1.55rem;
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  background: var(--surface);
+  box-shadow: var(--shadow-sm);
+  transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.card:hover {
+  transform: translateY(-4px);
+  border-color: var(--border-strong);
+  box-shadow: var(--shadow-md);
+}
+
+.icon {
+  width: 46px;
+  height: 46px;
+  display: grid;
+  place-items: center;
+  margin-bottom: 1rem;
+  border-radius: 13px;
+  color: #ffffff;
+  font-size: 1.25rem;
+  font-weight: 800;
+  background: var(--gradient-primary);
+}
+
+.card h3 {
+  margin: 0 0 0.55rem;
+  font-size: 1.02rem;
+}
+
+.card p {
+  margin: 0 0 1.1rem;
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+  line-height: 1.7;
+}
+
+.card a {
+  color: var(--primary);
+  font-size: 0.87rem;
+  font-weight: 700;
+  text-decoration: none;
+}

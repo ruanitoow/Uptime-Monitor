@@ -1,0 +1,52 @@
+.brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.75rem;
+  text-decoration: none;
+  color: var(--text-primary);
+}
+
+.mark {
+  width: 40px;
+  height: 40px;
+  display: inline-grid;
+  place-items: center;
+  border-radius: 12px;
+  color: #ffffff;
+  background: var(--gradient-primary);
+  box-shadow: 0 10px 24px rgba(79, 70, 229, 0.2);
+}
+
+.mark svg {
+  width: 26px;
+  height: 26px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2.2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.wordmark {
+  display: flex;
+  flex-direction: column;
+  line-height: 1;
+}
+
+.wordmark strong {
+  font-size: 1.05rem;
+  letter-spacing: -0.03em;
+}
+
+.wordmark span {
+  margin-top: 0.22rem;
+  color: var(--text-secondary);
+  font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+}
+
+.compact .wordmark {
+  display: none;
+}

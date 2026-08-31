@@ -1,4 +1,5 @@
 import style from "./actions.module.css";
+import { Link } from "react-router-dom";
 
 const variants = {
   primary: style.primary,
@@ -11,10 +12,10 @@ function Action(props) {
   const variantClass = variants[props.variant] ?? style.primary;
 
   return (
-    <a className={`${style.action} ${variantClass}`} href={props.url}>
+    <Link className={`${style.action} ${variantClass}`} to={props.url}>
       {props.img && <img src={props.img} alt={props.alt ?? ""} />}
       {props.name}
-    </a>
+    </Link>
   );
 }
 

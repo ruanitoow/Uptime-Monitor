@@ -1,4 +1,4 @@
-import { registerUsers } from "../services/register.service";
+import { registerUsers } from "../services/register.service.js";
 
 async function registerUser(req, res){
     const register = await registerUsers(req.body);

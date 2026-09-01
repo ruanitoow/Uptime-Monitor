@@ -5,11 +5,11 @@ import errorHandler from "./middlewares/errorHandler.middlerware.js";
 import routesRegisterSystem from "./routes/register.routes.js";
 import routesLoginSystem from "./routes/login.routes.js";
 
-const app = express();
-const port = process.env.PORT || 3000;
-
 // Setup do dotenv
 dotenv.config();
+
+const app = express();
+const port = process.env.PORT || 3000;
 
 // Configuração do CORS para permitir integração Front-Back
 const corsConfig = {

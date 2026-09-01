@@ -1,4 +1,3 @@
-import { tr } from "zod/v4/locales";
 import { loginUsers } from "../services/login.service.js";
 
 async function loginUser(req, res) {
@@ -6,11 +5,9 @@ async function loginUser(req, res) {
 
     res.cookie("token", login.token, {
         httpOnly: true,
-        secure: true,
+        secure: false,
         maxAge: 3600000
-    })
-
-    res.status(200).json(login);
+    }).status(200).json(login);
 }
 
 export { loginUser };

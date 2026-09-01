@@ -1,10 +1,6 @@
 import prisma from "../libs/prisma.js";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
-import { useDebugValue } from "react";
-import { id } from "zod/v4/locales";
-
-
 
 function createToken(userData) {
     const SECRET = process.env.SECRET;
@@ -29,20 +25,20 @@ async function loginUsers(info) {
     });
 
     if (userData == null) {
-        const error = Error("Esse usuário não existe");
-        error.statusCode = 400;
+        const error = Error("Email ou senha inválidos");
+        error.statusCode = 401;
         throw error;
     }
 
     const passwordVerification = await bcrypt.compare(password, userData.password)
 
     if (!passwordVerification) {
-        const error = Error("Senha incorreta");
-        error.statusCode = 400;
+        const error = Error("Email ou senha inválidos");
+        error.statusCode = 401;
         throw error;
     }
 
-    const newToken = createToken(userData.id);
+    const newToken = createToken(userData.id && userData.name);
 
     return {
         message: "Usuário logado com sucesso",

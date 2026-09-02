@@ -1,3 +1,4 @@
+import { useContext } from "react";
 import Action from "../../components/Buttons/Actions";
 import Container from "../../components/Containers/Container";
 import Footer from "../../layouts/Footer";
@@ -5,6 +6,7 @@ import Navbar from "../../layouts/Navbar";
 import FeatureCard from "./components/FeatureCard";
 import StepCard from "./components/StepCard";
 import style from "./home.module.css";
+import { UserContext } from "../../contexts/user.context.jsx";
 
 const stats = [
   { value: "99,99%", label: "Uptime monitorado" },
@@ -93,6 +95,8 @@ function DashboardPreview({ expanded = false }) {
 }
 
 function HomePage() {
+  const { user, setUserData, deleteUser } = useContext(UserContext);
+
   return (
     <div className={style.page}>
       <Navbar />
@@ -104,7 +108,7 @@ function HomePage() {
               <div className={style.heroCopy}>
                 <span className={style.badge}>● Monitoramento simples para serviços modernos</span>
                 <h1>
-                  Saiba que seu serviço caiu <span>antes dos seus usuários.</span>
+                  Seu nome é: <br/><strong>{user.name}</strong>
                 </h1>
                 <p>
                   Monitore sites, APIs e serviços, acompanhe uptime, latência e incidentes e concentre tudo em uma única dashboard.

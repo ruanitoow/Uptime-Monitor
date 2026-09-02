@@ -1,4 +1,3 @@
-
 import loginUserSchema from "../validations/loginSchema.js";
 
 function validateLogin(req, res, next) {

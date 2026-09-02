@@ -1,9 +1,11 @@
 import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
+import cookieparser from "cookie-parser";
 import errorHandler from "./middlewares/errorHandler.middlerware.js";
 import routesRegisterSystem from "./routes/register.routes.js";
 import routesLoginSystem from "./routes/login.routes.js";
+import routesUserSystem from "./routes/user.routes.js"
 
 const app = express();
 const port = process.env.PORT || 3000;
@@ -23,14 +25,16 @@ app.use(cors(corsConfig))
 // Middleware de JSON do Express
 app.use(express.json());
 
-// Rota de registro
-app.use(routesRegisterSystem);
+// Middleware de Cookies
+app.use(cookieparser());
 
-// Rota de login
-app.use(routesLoginSystem);
-
-// Tratamento Centralizado dos erros!
+// Tratamento de Erros
 app.use(errorHandler);
+
+// Rotas de API
+app.use(routesRegisterSystem);
+app.use(routesLoginSystem);
+app.use(routesUserSystem);
 
 app.listen(port, () => {
     console.log(`Rodando API em: http://localhost:${port}`);

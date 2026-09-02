@@ -63,19 +63,30 @@ function RegisterPage() {
       email,
       password
     }
-    const response = await fetch(url, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(payload)
-    });
-    if (!response.ok) {
+    try {
+      const response = await fetch(url, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(payload)
+      });
+      if (!response.ok) {
+        const data = await response.json()
+        setPopup({
+          open: true,
+          variant: "error",
+          title: data.status,
+          message: data.erro,
+        });
+        return;
+      }
+    } catch (e) {
       setPopup({
         open: true,
         variant: "error",
-        title: "500 Internal Error",
-        message: 'Não conseguimos contato com o sistema, tente novamente mais tarde!',
+        title: "500 Sem conexão com o servidor!",
+        message: "Não conseguimos contato com o servidor, tente novamente mais tarde ou entre em contato com o suporte",
       });
       return;
     }

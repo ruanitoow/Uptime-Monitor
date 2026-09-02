@@ -24,7 +24,7 @@ async function loginUsers(info) {
         }
     });
 
-    if (userData == null) {
+    if (userData === null) {
         const error = Error("Email ou senha inválidos");
         error.statusCode = 401;
         throw error;

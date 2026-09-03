@@ -6,7 +6,7 @@ import Navbar from "../../layouts/Navbar";
 import FeatureCard from "./components/FeatureCard";
 import StepCard from "./components/StepCard";
 import style from "./home.module.css";
-import { UserContext } from "../../contexts/user.context.jsx";
+import { UserContext } from "../../contexts/user.context";
 
 const stats = [
   { value: "99,99%", label: "Uptime monitorado" },
@@ -106,7 +106,6 @@ function HomePage() {
           <Container>
             <div className={style.heroGrid}>
               <div className={style.heroCopy}>
-                <span className={style.badge}>● Monitoramento simples para serviços modernos</span>
                 <h1>
                   Seu nome é: <br/><strong>{user.name}</strong>
                 </h1>

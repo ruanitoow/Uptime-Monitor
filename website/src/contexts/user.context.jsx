@@ -1,6 +1,6 @@
 import { createContext, useEffect, useState } from "react";
 
-const backendURL = import.meta.env.VITE_BACKEND_URL;
+let backendURL = import.meta.env.VITE_BACKEND_URL;
 
 const UserContext = createContext();
 const defaultUserData = {
@@ -25,6 +25,10 @@ function UserProvider({ children }) {
                     },
                     credentials: "include"
                 });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! Status: ${response.status}`);
+                }
 
                 const data = await response.json();
 

@@ -6,12 +6,13 @@ import errorHandler from "./middlewares/errorHandler.middlerware.js";
 import routesRegisterSystem from "./routes/register.routes.js";
 import routesLoginSystem from "./routes/login.routes.js";
 import routesUserSystem from "./routes/user.routes.js"
-
-const app = express();
-const port = process.env.PORT || 3000;
+import routesMonitors from "./routes/monitors.routes.js"
 
 // Setup do dotenv
 dotenv.config();
+
+const app = express();
+const port = process.env.PORT || 3000;
 
 // Configuração do CORS para permitir integração Front-Back
 const corsConfig = {
@@ -28,13 +29,14 @@ app.use(express.json());
 // Middleware de Cookies
 app.use(cookieparser());
 
-// Tratamento de Erros
-app.use(errorHandler);
-
 // Rotas de API
 app.use(routesRegisterSystem);
 app.use(routesLoginSystem);
 app.use(routesUserSystem);
+app.use(routesMonitors)
+
+// Tratamento de Erros
+app.use(errorHandler);
 
 app.listen(port, () => {
     console.log(`Rodando API em: http://localhost:${port}`);

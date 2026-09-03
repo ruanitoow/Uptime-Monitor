@@ -11,8 +11,8 @@ function validateAuth(req, res, next) {
     }
 
     try {
-        jwt.verify(jwtCookie, SECRET);
-
+        const payload = jwt.verify(jwtCookie, SECRET);
+        req.user = payload;
         next();
     } catch (err) {
         return res.status(403).json({ error: "Acesso negado" });

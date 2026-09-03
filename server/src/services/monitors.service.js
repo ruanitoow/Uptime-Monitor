@@ -1,8 +1,9 @@
 import prisma from "../libs/prisma.js"
 
-async function createMonitor(info) {
-    const {name, type, host, port, path} = info;
-    const data = {name, type, host, port, path}
+async function createMonitor(body, userIdentify) {
+    const {name, type, host, port, path} = body;
+    const userId = userIdentify;
+    const data = {name, type, host, port, path, userId}
     const monitor = await prisma.monitor.create({
         data
     })
@@ -10,4 +11,14 @@ async function createMonitor(info) {
     return monitor;
 }
 
-export default createMonitor;
+async function collectMonitors(userIdentify) {
+    const monitors = await prisma.monitor.findMany({
+        where: { 
+            userId: userIdentify 
+        }
+    });
+    
+    return monitors;
+}
+
+export { createMonitor, collectMonitors };

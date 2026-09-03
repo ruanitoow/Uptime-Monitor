@@ -38,7 +38,7 @@ async function loginUsers(info) {
         throw error;
     }
 
-    const newToken = createToken(userData.id && userData.name);
+    const newToken = createToken(userData);
 
     return {
         message: "Usuário logado com sucesso",

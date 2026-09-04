@@ -103,3 +103,332 @@
     border-radius: 12px;
   }
 }
+
+
+.createMenu {
+  position: fixed;
+  right: 2rem;
+  bottom: 2rem;
+  z-index: 900;
+
+  padding: 0.85rem 1.2rem;
+
+  border: 1px solid var(--primary);
+  border-radius: 12px;
+
+  color: #ffffff;
+  background: var(--primary);
+
+  font: inherit;
+  font-size: 0.9rem;
+  font-weight: 700;
+
+  cursor: pointer;
+
+  box-shadow:
+    0 10px 25px color-mix(
+      in srgb,
+      var(--primary) 25%,
+      transparent
+    );
+
+  transition:
+    transform 0.18s ease,
+    box-shadow 0.18s ease,
+    background-color 0.18s ease;
+}
+
+.createMenu:hover {
+  background: var(--primary-hover);
+
+  transform: translateY(-2px);
+
+  box-shadow:
+    0 14px 30px color-mix(
+      in srgb,
+      var(--primary) 32%,
+      transparent
+    );
+}
+
+.createMenu:active {
+  transform: translateY(0);
+}
+
+.createMenu:focus-visible {
+  outline: none;
+
+  box-shadow:
+    0 0 0 3px color-mix(
+      in srgb,
+      var(--primary) 15%,
+      transparent
+    ),
+    0 10px 25px color-mix(
+      in srgb,
+      var(--primary) 25%,
+      transparent
+    );
+}
+
+@media (max-width: 640px) {
+  .createMenu {
+    right: 1rem;
+    bottom: 1rem;
+
+    padding: 0.8rem 1rem;
+  }
+}
+
+.monitorsSection {
+  width: 100%;
+}
+
+.monitorGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+  margin-top: 2rem;
+}
+
+.monitorCard {
+  display: flex;
+  flex-direction: column;
+
+  min-width: 0;
+
+  padding: 1.25rem;
+
+  border: 1px solid var(--border);
+  border-radius: 16px;
+
+  background: var(--surface);
+
+  box-shadow:
+    0 8px 24px rgba(15, 23, 42, 0.05);
+
+  transition:
+    transform 0.18s ease,
+    box-shadow 0.18s ease,
+    border-color 0.18s ease;
+}
+
+.monitorCard:hover {
+  transform: translateY(-2px);
+
+  border-color: var(--border-strong);
+
+  box-shadow:
+    0 14px 30px rgba(15, 23, 42, 0.08);
+}
+
+.monitorHeader {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+
+  gap: 1rem;
+}
+
+.monitorType {
+  display: inline-block;
+
+  margin-bottom: 0.35rem;
+
+  color: var(--primary);
+
+  font-size: 0.7rem;
+  font-weight: 750;
+
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.monitorHeader h2 {
+  margin: 0;
+
+  color: var(--text-primary);
+
+  font-size: 1.05rem;
+  font-weight: 720;
+  line-height: 1.3;
+}
+
+.monitorHost {
+  display: block;
+
+  margin-top: 0.35rem;
+
+  overflow: hidden;
+
+  color: var(--text-muted);
+
+  font-size: 0.78rem;
+  line-height: 1.4;
+
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.statusBadge {
+  flex-shrink: 0;
+
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+
+  padding: 0.4rem 0.65rem;
+
+  border-radius: 999px;
+
+  font-size: 0.72rem;
+  font-weight: 700;
+}
+
+.statusOnline {
+  color: var(--success);
+  background: color-mix(
+    in srgb,
+    var(--success) 10%,
+    transparent
+  );
+}
+
+.statusOffline {
+  color: var(--danger);
+  background: color-mix(
+    in srgb,
+    var(--danger) 10%,
+    transparent
+  );
+}
+
+.statusDot {
+  width: 7px;
+  height: 7px;
+
+  border-radius: 50%;
+
+  background: currentColor;
+}
+
+.monitorDivider {
+  width: 100%;
+  height: 1px;
+
+  margin: 1.1rem 0;
+
+  background: var(--border);
+}
+
+.monitorStats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.75rem;
+}
+
+.stat {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+
+.stat span {
+  color: var(--text-muted);
+
+  font-size: 0.72rem;
+  font-weight: 600;
+}
+
+.stat strong {
+  color: var(--text-primary);
+
+  font-size: 0.95rem;
+  font-weight: 720;
+}
+
+.monitorFooter {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  gap: 1rem;
+
+  margin-top: 1.2rem;
+  padding-top: 1rem;
+
+  border-top: 1px solid var(--border);
+}
+
+.monitorFooter > span {
+  color: var(--text-muted);
+
+  font-size: 0.7rem;
+}
+
+.monitorAction {
+  padding: 0;
+
+  border: 0;
+
+  color: var(--primary);
+  background: transparent;
+
+  font: inherit;
+  font-size: 0.75rem;
+  font-weight: 700;
+
+  cursor: pointer;
+
+  transition:
+    color 0.16s ease,
+    transform 0.16s ease;
+}
+
+.monitorAction:hover {
+  color: var(--primary-hover);
+
+  transform: translateX(1px);
+}
+
+.monitorAction:focus-visible {
+  outline: none;
+
+  border-radius: 4px;
+
+  box-shadow:
+    0 0 0 3px color-mix(
+      in srgb,
+      var(--primary) 14%,
+      transparent
+    );
+}
+
+@media (max-width: 900px) {
+  .monitorGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 560px) {
+  .monitorCard {
+    padding: 1rem;
+  }
+
+  .monitorHeader {
+    flex-direction: column;
+  }
+
+  .statusBadge {
+    align-self: flex-start;
+  }
+
+  .monitorStats {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .monitorFooter {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+}

@@ -54,7 +54,7 @@ function withMonitors(monitors) {
             <article key={monitor.id} className={style.monitorCard}>
               <div className={style.monitorHeader}>
                 <div>
-                  <span className={style.monitorType}>
+                  <span className={style.type}>
                     {monitor.type}
                   </span>
 
@@ -68,11 +68,10 @@ function withMonitors(monitors) {
                 </div>
 
                 <span
-                  className={`${style.statusBadge} ${
-                    isOnline
+                  className={`${style.statusBadge} ${isOnline
                       ? style.statusOnline
                       : style.statusOffline
-                  }`}
+                    }`}
                 >
                   <span className={style.statusDot}></span>
                   {isOnline ? "Online" : "Offline"}
@@ -111,8 +110,8 @@ function withMonitors(monitors) {
                   Monitor criado em{" "}
                   {monitor.createdAt
                     ? new Date(monitor.createdAt).toLocaleDateString(
-                        "pt-BR"
-                      )
+                      "pt-BR"
+                    )
                     : "—"}
                 </span>
 
@@ -168,28 +167,33 @@ function DashboardPage() {
 
   useEffect(() => {
     async function getMonitors() {
-      const resposta = await fetch(`${backendURL}/monitors`, {
-        method: 'GET',
-        headers: { 'Content-Type': 'application/json' },
-        credentials: 'include'
-      })
-      const data = await resposta.json()
-      setMonitors(data)
-      return data;
+      try {
+        const resposta = await fetch(`${backendURL}/monitors`, {
+          method: 'GET',
+          headers: { 'Content-Type': 'application/json' },
+          credentials: 'include'
+        });
+        const data = await resposta.json();
+        setMonitors(data);
+      } catch (erro) {
+        console.error('Falha ao buscar monitores:', erro);
+      }
     }
     getMonitors();
-  }, [])
+  }, []);
 
+  // 2. Registrando o monitor e atualizando a lista na tela instantaneamente
   async function handleRegister(values) {
     const { host, type, port, name, path } = values;
-    const portNumber = Number(port)
+    const portNumber = Number(port);
     const payload = {
       host,
       type,
       port: portNumber,
       name,
       path,
-    }
+    };
+
     try {
       const resposta = await fetch(`${backendURL}/monitors`, {
         method: 'POST',
@@ -204,13 +208,15 @@ function DashboardPage() {
         throw new Error(`Erro na rede: ${resposta.status}`);
       }
 
-      setIsCreateMonitorOpen(false)
+      const novoMonitor = await resposta.json();
+
+      setMonitors((monitorsAtuais) => [...monitorsAtuais, novoMonitor]);
+
+      setIsCreateMonitorOpen(false);
     } catch (erro) {
-      console.error('Falha ao buscar dados:', erro);
+      console.error('Falha ao registrar monitor:', erro);
     }
   }
-
-
 
   return (
     <DashboardLayout>

@@ -13,8 +13,9 @@ async function createMonitor(body, userIdentify) {
 
 async function collectMonitors(userIdentify) {
     const monitors = await prisma.monitor.findMany({
-        where: { 
-            userId: userIdentify 
+        where: { userId: userIdentify },
+        include: {
+            checks: true,
         }
     });
     

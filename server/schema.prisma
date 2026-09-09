@@ -7,12 +7,12 @@ datasource db {
 }
 
 model User {
-  id        Int   @id @default(autoincrement())
-  email     String   @unique
+  id        Int       @id @default(autoincrement())
+  email     String    @unique
   name      String
-  password  String 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  password  String
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
   monitors  Monitor[]
 }
 
@@ -23,15 +23,31 @@ enum MonitorType {
 }
 
 model Monitor {
-  id        Int @id @default(autoincrement())
+  id        Int         @id @default(autoincrement())
   name      String
   type      MonitorType
   host      String
   port      Int
   path      String?
-  active    Boolean @default(true)
-  user      User @relation(fields: [userId], references: [id])
+  active    Boolean     @default(true)
+  user      User        @relation(fields: [userId], references: [id])
   userId    Int
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  checks    Check[]
+  createdAt DateTime    @default(now())
+  updatedAt DateTime    @updatedAt
+}
+
+enum CheckStatus {
+  UP
+  DOWN
+}
+
+model Check {
+  id         Int         @id @default(autoincrement())
+  status     CheckStatus
+  statusCode Int?
+  latency    Int
+  checkedAt  DateTime @default(now())
+  monitor    Monitor     @relation(fields: [monitorId], references: [id])
+  monitorId  Int
 }

@@ -10,14 +10,16 @@ async function workerAction() {
         }
     })
     for (const monitor of monitores) {
+        let check;
+        let monitorId
         try {
             if (monitor.type === "TCP") {
                 const payload = {
                     host: monitor.host,
                     port: monitor.port
                 }
-                const check = await tcpChecker(payload);
-                console.log(check)
+                check = await tcpChecker(payload);
+                monitorId = monitor.id
             } else if (monitor.type === "HTTP" || monitor.type === "HTTPS") {
                 const path = monitor.path ? monitor.path : ""
                 const payload = {
@@ -26,9 +28,17 @@ async function workerAction() {
                     port: monitor.port,
                     path: path
                 }
-                const check = await httpChecker(payload)
-                console.log(check)
+                check = await httpChecker(payload)
+                monitorId = monitor.id
             }
+            await prisma.check.create({
+                data: {
+                    status: check.status,
+                    statusCode: check.statusCode,
+                    latency: check.latency,
+                    monitorId
+                }
+            })
         } catch (e) {
             console.error(`Falha no monitor ${monitor.name}:`, e.message);
         }

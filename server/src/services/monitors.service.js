@@ -1,9 +1,9 @@
 import prisma from "../libs/prisma.js"
 
 async function createMonitor(body, userIdentify) {
-    const {name, type, host, port, path} = body;
+    const { name, type, host, port, path } = body;
     const userId = userIdentify;
-    const data = {name, type, host, port, path, userId}
+    const data = { name, type, host, port, path, userId }
     const monitor = await prisma.monitor.create({
         data
     })
@@ -15,11 +15,18 @@ async function collectMonitors(userIdentify) {
     const monitors = await prisma.monitor.findMany({
         where: { userId: userIdentify },
         include: {
-            checks: true,
+            checks: {
+                take: 1,
+                orderBy: { checkedAt: 'desc' }
+            }
         }
     });
-    
-    return monitors;
+
+    return monitors.map(monitor => ({
+        ...monitor,
+        status: monitor.checks[0]?.status ?? "DOWN",
+        latency: monitor.checks[0]?.latency ?? null
+    }));
 }
 
 export { createMonitor, collectMonitors };

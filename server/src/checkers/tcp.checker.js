@@ -1,32 +1,43 @@
-import net from "node:net"
+import net from "node:net";
 
-function tcpChecker(host, port) {
-    const cliente = new net.Socket();
-    const tryConnect = new Promise((resolve) => {
+function tcpChecker({host, port}) {
+    return new Promise((resolve) => {
+        const cliente = new net.Socket();
         cliente.setTimeout(5000);
         const inicio = Date.now();
+
         cliente.connect(port, host, () => {
-            const latencia = Date.now() - inicio;
-            const resultado = { sucesso: true, motivo: "Conexão bem sucedida", latencia };
+            const latency = Date.now() - inicio;
             cliente.destroy();
-            resolve(resultado);
+            resolve({
+                status: "UP",
+                latency: latency,
+                statusCode: null
+            });
         });
 
-        cliente.on('error', () => {
-            const resultado = { sucesso: false, motivo: "Inacessível" };
+        cliente.on('error', (error) => {
+            const latency = Date.now() - inicio;
+            console.error(`[Erro de Conexão TCP] Falha ao conectar em ${host}:${port}:`, error.message);
             cliente.destroy();
-            resolve(resultado);
+            resolve({
+                status: "DOWN",
+                latency: latency,
+                statusCode: null
+            });
         });
 
         cliente.on('timeout', () => {
-
-            const resultado = { sucesso: false, motivo: "Tempo esgotado" }
+            const latency = Date.now() - inicio;
+            console.error(`[Timeout TCP] O host ${host}:${port} demorou mais de 5s para responder.`);
             cliente.destroy();
-            resolve(resultado)
+            resolve({
+                status: "DOWN",
+                latency: latency,
+                statusCode: null
+            });
         });
     });
-
-    return tryConnect;
 }
 
 export default tcpChecker;

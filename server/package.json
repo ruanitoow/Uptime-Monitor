@@ -15,6 +15,7 @@
   },
   "scripts": {
     "dev": "node src/index.js",
+    "worker": "node src/worker/worker.js",
     "postinstall": "prisma skills sync || exit 0"
   },
   "devDependencies": {

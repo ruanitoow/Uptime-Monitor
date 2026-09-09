@@ -1,8 +1,10 @@
-async function httpChecker(host, path, port, type) {
+async function httpChecker({host, path, port, type}) {
     // 1. Garante que a URL tenha o protocolo e formata a porta corretamente
     const formatoPorta = port ? `:${port}` : '';
     if (path === null || path === undefined) {
         path = ''
+    } else if(!path.startsWith("/")){
+        path = "/" + path;
     }
     const target = `${type}://${host}${formatoPorta}${path}`;
     const inicio = Date.now()

@@ -1,810 +1,224 @@
-# 📡 Uptime Dashboard
+# 📡 Uptime Monitor
 
-Plataforma Full Stack para monitoramento de disponibilidade, latência e histórico de serviços HTTP.
+Plataforma Full Stack para monitoramento de disponibilidade, latência e histórico de serviços (HTTP, HTTPS e TCP).
 
-O projeto será desenvolvido em dupla como ambiente de aprendizado prático de desenvolvimento **Frontend + Backend**, arquitetura, banco de dados, trabalho colaborativo com Git/GitHub e evolução gradual até uma aplicação pronta para produção.
-
----
-
-## 🎯 Objetivo
-
-Construir uma plataforma capaz de:
-
-```text
-Cadastrar um monitor
-        ↓
-Verificar uma URL
-        ↓
-Medir resposta e latência
-        ↓
-Salvar o resultado
-        ↓
-Exibir o status na dashboard
-```
-
-O projeto será desenvolvido por etapas.
-
-A prioridade é:
-
-> construir corretamente → entender → testar → revisar → evoluir.
-
-Não queremos implementar toda a plataforma de uma vez.
+O projeto é desenvolvido em dupla como ambiente de aprendizado prático de desenvolvimento **Frontend + Backend**, arquitetura, banco de dados, trabalho colaborativo e evolução gradual até uma aplicação pronta para produção.
 
 ---
 
-# 🚧 Fase atual — MVP 1
+## 🎯 Visão geral
 
-Nesta primeira fase, o sistema deve permitir:
-
-- criar um monitor;
-- listar monitores;
-- realizar uma checagem HTTP;
-- identificar se o serviço está UP ou DOWN;
-- medir a latência;
-- registrar o status HTTP;
-- salvar as checagens no PostgreSQL;
-- visualizar o estado atual no frontend;
-- consultar o histórico básico de checagens.
-
-### Fluxo esperado
-
-```text
-Usuário
-   ↓
-React
-   ↓
-REST API
-   ↓
-Express
-   ↓
-Service
-   ↓
-Prisma
-   ↓
-PostgreSQL
-```
-
-Para executar uma checagem:
-
-```text
-Monitor
-   ↓
-HTTP Request
-   ↓
-URL monitorada
-   ↓
-status + latência
-   ↓
-Check
-   ↓
-PostgreSQL
-```
+O Uptime Monitor permite aos usuários cadastrar serviços e acompanhar sua disponibilidade por meio de checagens periódicas. O sistema utiliza um worker em background para realizar checagens periódicas e registrar métricas como status, latência e código HTTP, consolidando os dados em uma dashboard interativa.
 
 ---
 
-# 🧱 Stack
+## 🚀 Estado atual
 
-## Frontend
+Atualmente o sistema já conta com autenticação de usuários, gerenciamento de monitores, e um worker que roda em background (loop infinito) para realizar checagens ativas (HTTP, HTTPS, TCP). O frontend permite cadastro e login de usuários, além de exibir a lista de monitores cadastrados com seu status em tempo real.
 
-### React + Vite
-
-Responsável pela dashboard e interação com o usuário.
-
-**Motivos:**
-
-- componentização;
-- ecossistema moderno;
-- ótimo para aplicações SPA;
-- desenvolvimento rápido;
-- ambos poderão praticar React.
-
-### React Router
-
-Responsável pela navegação entre páginas.
-
-### CSS Modules
-
-Utilizado inicialmente para estilização.
-
-Permite:
-
-- CSS tradicional;
-- escopo por componente;
-- menor risco de conflito entre estilos;
-- controle da interface sem introduzir outra abstração agora.
-
-### Fetch API
-
-Inicialmente utilizada para comunicação com o backend.
-
-### Recharts
-
-Será introduzido quando começarmos a exibir:
-
-- latência;
-- histórico;
-- uptime;
-- métricas.
-
-### TanStack Query
-
-Será introduzido quando a quantidade de dados remotos justificar gerenciamento de:
-
-- cache;
-- loading;
-- refetch;
-- estados de erro;
-- sincronização com a API.
+O fluxo de autenticação via cookies (HTTPOnly) está estabelecido, e a comunicação Frontend ↔ Backend ocorre de forma autenticada.
 
 ---
 
-# ⚙️ Backend
+## 🧩 Funcionalidades
 
-## Node.js
+### ✅ Implementadas
 
-Runtime JavaScript utilizado no servidor.
+* **Autenticação:** Cadastro de usuários e login com JWT armazenado em cookie HttpOnly.
+* **Gerenciamento de Monitores (Backend & Frontend):** Criação e listagem de monitores.
+* **Tipos de Monitoramento:** Suporte para HTTP, HTTPS e TCP.
+* **Worker de Checagem (Backend):** Execução em background para aferir latência, status e `statusCode` dos monitores ativos a cada 5 segundos, sem bloquear a API principal.
+* **Dashboard (Frontend):** Interface de visualização da lista de monitores e seus status mais recentes.
+* **Camada de Proteção:** Proteção de rotas do backend usando middlewares de validação e restrição de acesso a recursos apenas pelo dono (Usuário).
+* **API de Detalhes e Deleção (Backend):** Endpoints para buscar histórico detalhado e deletar monitores com exclusão em cascata das checagens relacionadas.
 
-## Express
+### 🟡 Parcialmente implementadas
 
-Responsável pela API REST.
+* **Visualização de Detalhes do Monitor (Frontend):** A API suporta, e a tela exibe o botão, mas a navegação/página de detalhes ainda não foi criada no frontend.
+* **Exclusão de Monitores (Frontend):** O endpoint `DELETE` existe no backend, mas a interface não possui botão ou fluxo para chamá-lo.
+* **Logout:** O frontend limpa o contexto local do usuário, mas não há um endpoint no backend para invalidar/limpar o cookie da sessão.
 
-Arquitetura inicial:
+### ⬜ Planejadas / Não implementadas
 
-```text
-Route
-  ↓
-Controller
-  ↓
-Service
-  ↓
-Prisma
-  ↓
-PostgreSQL
-```
-
-## Zod
-
-Responsável pela validação de entrada.
-
-Exemplos:
-
-```text
-URL válida?
-nome obrigatório?
-intervalo válido?
-timeout válido?
-```
-
-Regras de negócio continuam no Service.
-
-Exemplo:
-
-```text
-o usuário pode criar esse monitor?
-esse recurso existe?
-essa operação pode acontecer?
-```
-
-## Prisma ORM
-
-Responsável pela comunicação da aplicação com o banco.
-
-Usaremos:
-
-- models;
-- migrations;
-- relations;
-- queries;
-- transactions quando necessário.
-
-## PostgreSQL
-
-Banco relacional principal da aplicação.
+* **Sistema de Incidentes:** Abertura e fechamento de incidentes quando um serviço cai.
+* **Notificações:** Alertas via Webhook, Discord, Email, etc.
+* **Métricas Avançadas:** Gráficos (Recharts) detalhando histórico, cálculo de uptime % e latência média.
+* **Paginação/Limitação de Checagens no Frontend:** Lidar visualmente com um longo histórico.
 
 ---
 
-# 🗄️ Modelagem inicial
+## 🧱 Stack
 
-O MVP começa com duas entidades principais:
+**Frontend:**
+* React (Vite)
+* React Router (Navegação)
+* CSS Modules (Estilização)
+* Context API (Gerenciamento de sessão de usuário)
 
-```text
-Monitor 1 ───────── N Check
-```
+**Backend:**
+* Node.js
+* Express 5.2 (API REST)
+* Prisma ORM
+* JWT e Bcrypt (Autenticação e hash de senhas)
+* Zod (Validação de schemas)
 
-## Monitor
-
-Representa um serviço que deve ser monitorado.
-
-Campos inicialmente previstos:
-
-```text
-id
-name
-url
-active
-createdAt
-updatedAt
-```
-
-Campos como `interval` e `timeout` poderão ser adicionados quando o monitoramento automático entrar.
+**Banco de Dados:**
+* PostgreSQL
 
 ---
 
-## Check
+## 🏗️ Arquitetura e Fluxos Principais
 
-Representa o resultado de uma checagem.
+O backend segue a arquitetura de camadas:
+`Route` → `Middleware` (Validações Zod / JWT) → `Controller` → `Service` → `Prisma` → `PostgreSQL`
 
-Campos inicialmente previstos:
+### Fluxo de Checagem (Worker)
+O worker de checagem opera paralelamente à API principal. Ele busca todos os monitores ativos no banco de dados, executa a requisição correspondente (TCP ou HTTP/HTTPS) e persiste os resultados (Check) no banco de dados. Este ciclo se repete a cada 5 segundos via `node:timers/promises` para não travar o Event Loop.
 
-```text
-id
-monitorId
-status
-statusCode
-latency
-checkedAt
-```
-
-Relação:
-
-```text
-Check.monitorId
-       ↓
-Monitor.id
-```
-
-Um `Monitor` pode possuir muitas `Checks`.
+### Fluxo de Autenticação
+1. Usuário envia credenciais para `/login`.
+2. Backend valida, assina um JWT e o envia como um cookie `HttpOnly`.
+3. Frontend acessa páginas protegidas, enviando `credentials: "include"`.
+4. Backend `validateAuth` verifica o cookie e injeta o usuário no `req.user`.
 
 ---
 
-# 📡 Status do monitor
+## 🗂️ Estrutura do Projeto
 
-Inicialmente consideraremos:
-
-```text
-UP
-DOWN
-```
-
-Uma checagem deverá registrar informações como:
-
-```json
-{
-  "status": "UP",
-  "statusCode": 200,
-  "latency": 132
-}
-```
-
-ou:
-
-```json
-{
-  "status": "DOWN",
-  "statusCode": 500,
-  "latency": 240
-}
-```
-
-Falhas de conexão e timeout também deverão resultar em uma checagem registrada.
-
----
-
-# 🔗 API inicial
-
-Endpoints previstos para o MVP:
-
-```http
-POST   /monitors
-GET    /monitors
-GET    /monitors/:id
-PATCH  /monitors/:id
-DELETE /monitors/:id
-```
-
-Checagens:
-
-```http
-POST /monitors/:id/check
-GET  /monitors/:id/checks
-```
-
-O endpoint:
-
-```http
-POST /monitors/:id/check
-```
-
-executará inicialmente uma checagem manual.
-
-Automação periódica virá depois.
-
----
-
-# 🖥️ Frontend inicial
-
-## Dashboard
-
-Deve exibir:
+O projeto é dividido em dois diretórios principais: `server` (Backend) e `website` (Frontend).
 
 ```text
-Nome
-URL
-Status
-Latência
-Última checagem
-```
-
-Exemplo:
-
-```text
-┌──────────────────────────────────────────────┐
-│ Odyssey API                                 │
-│ https://api.exemplo.com                     │
-│                                             │
-│ ● UP       132 ms       há 20 segundos      │
-└──────────────────────────────────────────────┘
-```
-
-## Criar monitor
-
-Formulário inicial:
-
-```text
-Nome
-URL
-```
-
-## Detalhes do monitor
-
-Exibir:
-
-```text
-status atual
-última checagem
-latência
-status HTTP
-histórico
-```
-
-Gráficos serão adicionados posteriormente.
-
----
-
-# 🗂️ Estrutura inicial
-
-Uma possível estrutura:
-
-```text
-uptime-dashboard/
-│
-├── frontend/
-│   ├── src/
-│   │   ├── components/
-│   │   ├── pages/
-│   │   ├── services/
-│   │   └── styles/
-│   │
-│   └── package.json
-│
-├── backend/
-│   ├── src/
-│   │   ├── controllers/
-│   │   ├── routes/
-│   │   ├── services/
-│   │   ├── middlewares/
-│   │   ├── schemas/
-│   │   ├── libs/
-│   │   └── server.js
-│   │
+Uptime-Monitor/
+├── server/
 │   ├── prisma/
 │   │   ├── migrations/
 │   │   └── schema.prisma
-│   │
-│   └── package.json
+│   └── src/
+│       ├── checkers/        # Lógica de requests (HTTP/TCP)
+│       ├── controllers/     # Controladores das rotas
+│       ├── libs/            # Instâncias globais (ex: Prisma Client)
+│       ├── middlewares/     # Interceptadores (Autenticação, Validação Zod, Tratamento de erro)
+│       ├── routes/          # Definição dos endpoints
+│       ├── services/        # Regras de negócio e acesso ao BD
+│       ├── validations/     # Schemas Zod
+│       ├── worker/          # Worker autônomo rodando em background
+│       └── index.js         # Entrypoint da API
 │
-└── README.md
-```
-
-A estrutura poderá evoluir conforme aparecer necessidade real.
-
----
-
-# 👥 Desenvolvimento em dupla
-
-Os dois desenvolvedores atuarão como **Full Stack**.
-
-Não haverá separação permanente:
-
-```text
-Pedro → Backend
-Outro dev → Frontend
-```
-
-Em vez disso, trabalharemos por feature.
-
-Exemplo:
-
-```text
-Feature: Criar Monitor
-
-Dev A
-→ Backend
-
-Dev B
-→ Frontend
-```
-
-Na próxima feature:
-
-```text
-Dev A
-→ Frontend
-
-Dev B
-→ Backend
-```
-
-Assim ambos praticam toda a stack.
-
----
-
-# 🔄 Fluxo de desenvolvimento
-
-Cada feature deverá seguir:
-
-```text
-Definir requisito
-      ↓
-Definir contrato da API
-      ↓
-Criar branch
-      ↓
-Implementar
-      ↓
-Testar
-      ↓
-Push
-      ↓
-Pull Request
-      ↓
-Code Review pelo outro dev
-      ↓
-Correções
-      ↓
-Merge
+└── website/
+    └── src/
+        ├── components/      # Componentes reutilizáveis (Botões, Cards, Dashboard Layout)
+        ├── contexts/        # Contextos do React (ex: UserContext)
+        ├── layouts/         # Estruturas de página (Sidebar, Navbar)
+        ├── pages/           # Views principais (Home, Login, Register, Dashboard)
+        ├── routes/          # Definição do React Router
+        ├── style/           # CSS global
+        └── main.jsx         # Entrypoint do React
 ```
 
 ---
 
-# 🌿 Git
+## ️ Banco de Dados
 
-Branch principal:
+O banco relacional baseia-se em 3 entidades principais:
 
-```text
-main
-```
-
-Branches de feature:
-
-```text
-feature/create-monitor
-feature/list-monitors
-feature/manual-check
-feature/check-history
-```
-
-Exemplos de commits:
-
-```text
-feat: adiciona criação de monitores
-feat: implementa checagem HTTP manual
-fix: corrige cálculo de latência
-refactor: separa lógica de checks em service
-docs: atualiza endpoints de monitoramento
-```
+* **User**: Autenticação e posse de recursos. Relaciona-se 1:N com `Monitor`.
+* **Monitor**: Configurações de serviço (Host, Port, Path, Type). Relaciona-se 1:N com `Check`.
+* **Check**: O resultado de cada checagem efetuada pelo worker (Status UP/DOWN, StatusCode, Latency, data/hora da checagem (checkedAt)).
 
 ---
 
-# 👀 Code Review
+## 🔌 API
 
-Quem não implementou a feature deverá revisar.
+Endpoints principais do backend atualmente:
 
-O reviewer deve conseguir responder:
+**Autenticação e Usuário**
+* `POST /register`: Cria nova conta.
+* `POST /login`: Autentica usuário e retorna cookie HTTPOnly.
+* `GET /user/data`: Retorna os dados do usuário logado baseado no cookie.
 
-```text
-Entendi o fluxo?
-A responsabilidade está na camada correta?
-Existe código duplicado?
-Os erros estão sendo tratados?
-O input é validado?
-A feature pode quebrar outra coisa?
-Eu conseguiria modificar esse código depois?
-```
-
-A regra é:
-
-> Se somente quem escreveu entende o código, a feature ainda não terminou.
+**Monitores**
+* `POST /monitors`: Cadastra um monitor.
+* `GET /monitors`: Lista todos os monitores do usuário logado (trazendo o último Check).
+* `GET /monitors/:id`: Traz detalhes do monitor e os últimos 50 Checks.
+* `DELETE /monitors/:id`: Deleta monitor e suas checagens associadas.
 
 ---
 
-# ✅ Definition of Done
+## ⚙️ Configuração e Execução
 
-Uma feature só é considerada concluída quando:
+### Variáveis de Ambiente
+Crie um `.env` tanto na raiz do backend (`/server`) quanto do frontend (`/website`), baseando-se nos seus respectivos `.env.example`.
 
-```text
-[ ] funciona
-[ ] foi testada
-[ ] erros relevantes foram tratados
-[ ] código está organizado
-[ ] não existem credenciais no repositório
-[ ] outro desenvolvedor revisou
-[ ] PR foi aprovado
-[ ] documentação foi atualizada quando necessário
-[ ] foi mergeada sem quebrar a main
+**Backend (`server/.env`):**
+```env
+DATABASE_URL="postgresql://user:password@localhost:5432/uptime?schema=public"
+PORT=3000
+SECRET="sua_chave_secreta"
 ```
+
+**Frontend (`website/.env`):**
+```env
+VITE_BACKEND_URL="http://localhost:3000"
+```
+
+### Como Executar
+
+O projeto exige **Node.js** e **PostgreSQL**.
+
+1. **Instalar dependências (ambos):**
+   No diretório `/server`: `npm install`
+   No diretório `/website`: `npm install`
+
+2. **Configurar o banco:**
+   No diretório `/server`: `npx prisma migrate dev`
+
+3. **Iniciar a API (Backend):**
+   No diretório `/server`: `npm run dev`
+
+4. **Iniciar o Worker (Backend):**
+   No diretório `/server`: `npm run worker`
+   *(É necessário rodar o worker num terminal separado para o sistema de monitoramento funcionar!)*
+
+5. **Iniciar o Frontend:**
+   No diretório `/website`: `npm run dev`
 
 ---
 
-# 🧠 Regra de aprendizado
+## 🗺️ MVPs / Roadmap (Atualizado)
 
-O projeto não deve ser produzido integralmente por IA.
+O cronograma e planejamento do projeto baseiam-se nos desenvolvimentos e testes concluídos.
 
-Fluxo recomendado quando alguém travar:
+### ✅ MVP 1: Estrutura Base, Usuários e Monitores
+- [x] Modelos de Banco de Dados.
+- [x] API REST com Express e Prisma.
+- [x] Autenticação (JWT, Bcrypt, cookie HttpOnly).
+- [x] Layout Base React e Context API.
+- [x] Criação e listagem inicial de monitores (API e Frontend).
 
-```text
-1. tentar resolver sozinho
-        ↓
-2. consultar documentação
-        ↓
-3. pedir uma pista
-        ↓
-4. pedir explicação conceitual
-        ↓
-5. consultar exemplo isolado
-        ↓
-6. somente então analisar uma solução completa
-```
+### 🟡 MVP 2: Monitoramento Contínuo e Detalhes
+- [x] Worker para checagem assíncrona.
+- [x] Tipos de check: HTTP, HTTPS, TCP.
+- [x] Registro de status e latência.
+- [ ] Remoção de monitores via Frontend.
+- [ ] Visualização detalhada (Página de Detalhes no Frontend).
+- [ ] Apresentação inicial do histórico das últimas 50 requisições (API já pronta).
 
-Quem implementou uma parte deve conseguir explicar:
+### ⬜ MVP 3: Dashboard e Métricas Avançadas
+- [ ] Integração do Recharts para gráficos de tempo de resposta.
+- [ ] Cálculo real de Uptime % mensal/semanal.
+- [ ] Paginação do Histórico.
 
-```text
-o que ela faz
-por que foi feita assim
-como os dados percorrem o sistema
-o que acontece quando falha
-qual camada possui cada responsabilidade
-```
-
----
-
-# 📋 Requisitos do MVP 1
-
-## Backend
-
-```text
-[ ] Model Monitor
-[ ] Model Check
-[ ] Relação Monitor 1:N Check
-[ ] Migrations
-[ ] CRUD de Monitor
-[ ] Validação com Zod
-[ ] Tratamento centralizado de erros
-[ ] Check HTTP manual
-[ ] Captura de status HTTP
-[ ] Medição de latência
-[ ] Tratamento de timeout/falha
-[ ] Persistência de Checks
-[ ] Histórico por Monitor
-```
-
-## Frontend
-
-```text
-[ ] Layout base
-[ ] Dashboard
-[ ] Lista de monitores
-[ ] Criar monitor
-[ ] Estado UP/DOWN
-[ ] Exibir latência
-[ ] Exibir última checagem
-[ ] Executar check manual
-[ ] Página de detalhes
-[ ] Histórico básico
-[ ] Loading
-[ ] Erros da API
-```
-
-## Projeto
-
-```text
-[ ] README
-[ ] .gitignore
-[ ] .env.example
-[ ] branches
-[ ] Pull Requests
-[ ] code review
-[ ] commits organizados
-```
+### ⬜ MVP 4: Incidentes e Notificações
+- [ ] Criação do Modelo `Incident` (Downtime reportado).
+- [ ] Fechamento de Incidentes automáticos no retorno do serviço.
+- [ ] Integração com webhooks (Discord/Slack).
 
 ---
 
-# 🚫 Fora do escopo do MVP 1
+## 🚫 Limitações atuais
 
-Ainda NÃO implementar:
+* A checagem de intervalo do worker é fixa em 5 segundos, sem suporte ainda para customização por monitor.
+* Front-end ainda não possui interface para exclusão de monitores (embora o endpoint de deleção exista no backend). A funcionalidade de edição de monitores ainda não foi implementada na API nem na interface.
+* Embora existam timeouts configurados internamente no backend, ainda não é possível personalizá-los via UI.
+* A sessão do lado do cliente dura enquanto o cookie persistir, mas o logout explicitamente apenas limpa a UI e não quebra a validade do cookie no lado do servidor (falta `POST /logout` no backend).
 
-```text
-autenticação
-JWT
-OAuth
-Redis
-BullMQ
-RabbitMQ
-Kafka
-microserviços
-WebSockets
-Docker
-CI/CD
-email
-Discord alerts
-status page pública
-billing
-planos
-times
-multi-tenancy
-```
-
-Esses recursos entram quando houver necessidade.
-
-A prioridade agora é:
-
-```text
-Monitor
-   ↓
-Check
-   ↓
-Persistência
-   ↓
-Dashboard
-```
-
----
-
-# 🗺️ Roadmap do projeto
-
-## MVP 1 — Monitoramento básico
-
-```text
-Monitor
-→ check manual
-→ persistência
-→ dashboard
-```
-
-## MVP 2 — Monitoramento automático
-
-```text
-intervalos
-→ scheduler
-→ timeout
-→ checks automáticos
-```
-
-## MVP 3 — Métricas
-
-```text
-histórico
-→ uptime %
-→ latência média
-→ gráficos
-```
-
-## MVP 4 — Usuários
-
-```text
-User
-→ cadastro
-→ login
-→ autenticação
-→ autorização
-→ User 1:N Monitor
-```
-
-## MVP 5 — Incidentes
-
-```text
-DOWN
-→ abre incidente
-
-UP novamente
-→ fecha incidente
-
-→ duração
-→ histórico
-```
-
-## MVP 6 — Notificações
-
-```text
-DOWN
-→ webhook
-→ Discord
-→ email
-```
-
-## MVP 7 — Escalabilidade
-
-Quando necessário:
-
-```text
-Redis
-→ BullMQ
-→ workers
-→ retries
-→ backoff
-→ concorrência
-```
-
-## MVP 8 — Produção
-
-```text
-Docker
-→ CI/CD
-→ deploy
-→ HTTPS
-→ logs
-→ observabilidade
-```
-
----
-
-# 🎯 Critério para finalizar esta fase
-
-O MVP 1 estará concluído quando conseguirmos fazer:
-
-```text
-Cadastrar Monitor
-       ↓
-Executar Check
-       ↓
-Receber resposta HTTP
-       ↓
-Medir latência
-       ↓
-Salvar Check
-       ↓
-Consultar histórico
-       ↓
-Visualizar tudo no React
-```
-
-sem depender de dados mockados.
-
----
-
-# 📈 Objetivo de aprendizado
-
-Ao finalizar esta fase, ambos devem conseguir explicar e implementar:
-
-- API REST;
-- arquitetura Route → Controller → Service;
-- React consumindo backend real;
-- validação com Zod;
-- Prisma;
-- PostgreSQL;
-- relations 1:N;
-- migrations;
-- tratamento de erros;
-- integração Frontend ↔ Backend;
-- requisições HTTP;
-- trabalho com Git em equipe;
-- Pull Requests;
-- code review.
-
----
-
-## 🚀 Filosofia do projeto
-
-> Não queremos construir tudo rápido.
-
-Queremos construir algo que os dois consigam entender, manter, explicar e evoluir.

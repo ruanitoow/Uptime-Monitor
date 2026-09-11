@@ -14,7 +14,7 @@ O Uptime Monitor permite aos usuários cadastrar serviços e acompanhar sua disp
 
 ## 🚀 Estado atual
 
-Atualmente o sistema já conta com autenticação de usuários, gerenciamento de monitores, e um worker que roda em background (loop infinito) para realizar checagens ativas (HTTP, HTTPS, TCP). O frontend permite cadastro e login de usuários, além de exibir a lista de monitores cadastrados com seu status em tempo real.
+Atualmente o sistema já conta com autenticação de usuários, gerenciamento de monitores e um worker que roda em background (loop infinito) para realizar checagens ativas (HTTP, HTTPS, TCP). O frontend permite cadastro e login de usuários, além de exibir a lista de monitores cadastrados com o status mais recente retornado pela API.
 
 O fluxo de autenticação via cookies (HTTPOnly) está estabelecido, e a comunicação Frontend ↔ Backend ocorre de forma autenticada.
 
@@ -27,10 +27,10 @@ O fluxo de autenticação via cookies (HTTPOnly) está estabelecido, e a comunic
 * **Autenticação:** Cadastro de usuários e login com JWT armazenado em cookie HttpOnly.
 * **Gerenciamento de Monitores (Backend & Frontend):** Criação e listagem de monitores.
 * **Tipos de Monitoramento:** Suporte para HTTP, HTTPS e TCP.
-* **Worker de Checagem (Backend):** Execução em background para aferir latência, status e `statusCode` dos monitores ativos a cada 5 segundos, sem bloquear a API principal.
+* **Worker de Checagem (Backend):** Execução em background para aferir latência, status e `statusCode` dos monitores ativos, aguardando 5 segundos entre os ciclos de checagem.
 * **Dashboard (Frontend):** Interface de visualização da lista de monitores e seus status mais recentes.
 * **Camada de Proteção:** Proteção de rotas do backend usando middlewares de validação e restrição de acesso a recursos apenas pelo dono (Usuário).
-* **API de Detalhes e Deleção (Backend):** Endpoints para buscar histórico detalhado e deletar monitores com exclusão em cascata das checagens relacionadas.
+* **API de Detalhes e Deleção (Backend):** Endpoints para buscar histórico detalhado e excluir monitores, removendo previamente as checagens relacionadas.
 
 ### 🟡 Parcialmente implementadas
 
@@ -73,9 +73,11 @@ O backend segue a arquitetura de camadas:
 `Route` → `Middleware` (Validações Zod / JWT) → `Controller` → `Service` → `Prisma` → `PostgreSQL`
 
 ### Fluxo de Checagem (Worker)
-O worker de checagem opera paralelamente à API principal. Ele busca todos os monitores ativos no banco de dados, executa a requisição correspondente (TCP ou HTTP/HTTPS) e persiste os resultados (Check) no banco de dados. Este ciclo se repete a cada 5 segundos via `node:timers/promises` para não travar o Event Loop.
+
+O worker de checagem opera paralelamente à API principal. Ele busca todos os monitores ativos no banco de dados, executa a requisição correspondente (TCP ou HTTP/HTTPS) e persiste os resultados (Check) no banco de dados. Após concluir um ciclo de checagem dos monitores ativos, o worker aguarda 5 segundos via `node:timers/promises` antes de iniciar o próximo ciclo.
 
 ### Fluxo de Autenticação
+
 1. Usuário envia credenciais para `/login`.
 2. Backend valida, assina um JWT e o envia como um cookie `HttpOnly`.
 3. Frontend acessa páginas protegidas, enviando `credentials: "include"`.
@@ -90,9 +92,9 @@ O projeto é dividido em dois diretórios principais: `server` (Backend) e `webs
 ```text
 Uptime-Monitor/
 ├── server/
-│   ├── prisma/
-│   │   ├── migrations/
-│   │   └── schema.prisma
+│   ├── migrations/
+│   ├── schema.prisma
+│   ├── prisma.config.js
 │   └── src/
 │       ├── checkers/        # Lógica de requests (HTTP/TCP)
 │       ├── controllers/     # Controladores das rotas
@@ -117,13 +119,13 @@ Uptime-Monitor/
 
 ---
 
-## ️ Banco de Dados
+## 🗄️ Banco de Dados
 
 O banco relacional baseia-se em 3 entidades principais:
 
 * **User**: Autenticação e posse de recursos. Relaciona-se 1:N com `Monitor`.
 * **Monitor**: Configurações de serviço (Host, Port, Path, Type). Relaciona-se 1:N com `Check`.
-* **Check**: O resultado de cada checagem efetuada pelo worker (Status UP/DOWN, StatusCode, Latency, data/hora da checagem (checkedAt)).
+* **Check**: O resultado de cada checagem efetuada pelo worker (Status UP/DOWN, StatusCode, Latency, data/hora da checagem (`checkedAt`)).
 
 ---
 
@@ -147,6 +149,7 @@ Endpoints principais do backend atualmente:
 ## ⚙️ Configuração e Execução
 
 ### Variáveis de Ambiente
+
 Crie um `.env` tanto na raiz do backend (`/server`) quanto do frontend (`/website`), baseando-se nos seus respectivos `.env.example`.
 
 **Backend (`server/.env`):**
@@ -189,6 +192,7 @@ O projeto exige **Node.js** e **PostgreSQL**.
 O cronograma e planejamento do projeto baseiam-se nos desenvolvimentos e testes concluídos.
 
 ### ✅ MVP 1: Estrutura Base, Usuários e Monitores
+
 - [x] Modelos de Banco de Dados.
 - [x] API REST com Express e Prisma.
 - [x] Autenticação (JWT, Bcrypt, cookie HttpOnly).
@@ -196,6 +200,7 @@ O cronograma e planejamento do projeto baseiam-se nos desenvolvimentos e testes 
 - [x] Criação e listagem inicial de monitores (API e Frontend).
 
 ### 🟡 MVP 2: Monitoramento Contínuo e Detalhes
+
 - [x] Worker para checagem assíncrona.
 - [x] Tipos de check: HTTP, HTTPS, TCP.
 - [x] Registro de status e latência.
@@ -204,11 +209,13 @@ O cronograma e planejamento do projeto baseiam-se nos desenvolvimentos e testes 
 - [ ] Apresentação inicial do histórico das últimas 50 requisições (API já pronta).
 
 ### ⬜ MVP 3: Dashboard e Métricas Avançadas
+
 - [ ] Integração do Recharts para gráficos de tempo de resposta.
 - [ ] Cálculo real de Uptime % mensal/semanal.
 - [ ] Paginação do Histórico.
 
 ### ⬜ MVP 4: Incidentes e Notificações
+
 - [ ] Criação do Modelo `Incident` (Downtime reportado).
 - [ ] Fechamento de Incidentes automáticos no retorno do serviço.
 - [ ] Integração com webhooks (Discord/Slack).
@@ -217,8 +224,7 @@ O cronograma e planejamento do projeto baseiam-se nos desenvolvimentos e testes 
 
 ## 🚫 Limitações atuais
 
-* A checagem de intervalo do worker é fixa em 5 segundos, sem suporte ainda para customização por monitor.
+* O worker aguarda 5 segundos após concluir um ciclo de checagem antes de iniciar o próximo; o intervalo ainda não é configurável por monitor.
 * Front-end ainda não possui interface para exclusão de monitores (embora o endpoint de deleção exista no backend). A funcionalidade de edição de monitores ainda não foi implementada na API nem na interface.
 * Embora existam timeouts configurados internamente no backend, ainda não é possível personalizá-los via UI.
 * A sessão do lado do cliente dura enquanto o cookie persistir, mas o logout explicitamente apenas limpa a UI e não quebra a validade do cookie no lado do servidor (falta `POST /logout` no backend).
-

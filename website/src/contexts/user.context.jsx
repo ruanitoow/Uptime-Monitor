@@ -10,6 +10,7 @@ const defaultUserData = {
 
 function UserProvider({ children }) {
     const [user, setUserData] = useState(defaultUserData);
+    const [terminated, setTerminated] = useState(false);
 
     function deleteUser() {
         setUserData(defaultUserData);
@@ -29,12 +30,12 @@ function UserProvider({ children }) {
                 if (!response.ok) {
                     throw new Error(`HTTP error! Status: ${response.status}`);
                 }
-
                 const data = await response.json();
-
                 setUserData(data.name ? data : defaultUserData);
             } catch (err) {
                 deleteUser()
+            } finally {
+                setTerminated(true);
             }
         }
 
@@ -46,7 +47,8 @@ function UserProvider({ children }) {
             value={{
                 user,
                 setUserData,
-                deleteUser
+                deleteUser,
+                terminated
             }}
         >
             {children}

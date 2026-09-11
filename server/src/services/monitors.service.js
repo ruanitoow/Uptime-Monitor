@@ -29,4 +29,25 @@ async function collectMonitors(userIdentify) {
     }));
 }
 
-export { createMonitor, collectMonitors };
+async function collectMonitorsById(params, userIdentify) {
+    const id = parseInt(params)
+    const idInvalido = isNaN(id)
+    const userId = userIdentify
+    if (idInvalido) return null;
+
+    let monitor = await prisma.monitor.findFirst({
+        where: {
+            id,
+            userId
+        }, include: {
+            checks: {
+                take: 50,
+                orderBy: {
+                    checkedAt: 'desc'
+                }
+            }
+        }
+    })
+    return monitor;
+}
+export { createMonitor, collectMonitors, collectMonitorsById };

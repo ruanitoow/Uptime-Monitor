@@ -50,4 +50,20 @@ async function collectMonitorsById(params, userIdentify) {
     })
     return monitor;
 }
-export { createMonitor, collectMonitors, collectMonitorsById };
+
+async function deleteMonitor(params, userIdentify) {
+    const id = parseInt(params, 10);
+    if (isNaN(id)) return null;
+    const monitor = await prisma.monitor.findFirst({
+        where: { id, userId: userIdentify }
+    });
+    if (!monitor) return null;
+    await prisma.check.deleteMany({
+        where: { monitorId: id }
+    });
+    await prisma.monitor.delete({
+        where: { id }
+    });
+    return monitor;
+}
+export { createMonitor, collectMonitors, collectMonitorsById, deleteMonitor };

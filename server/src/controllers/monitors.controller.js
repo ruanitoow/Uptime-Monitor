@@ -1,4 +1,4 @@
-import { collectMonitors, createMonitor, collectMonitorsById } from "../services/monitors.service.js";
+import { collectMonitors, createMonitor, collectMonitorsById, deleteMonitor } from "../services/monitors.service.js";
 
 async function registerMonitor(req, res) {
     const monitor = await createMonitor(req.body, req.user.id);
@@ -18,4 +18,12 @@ async function getMonitorById(req, res) {
     res.status(200).json(monitor)
 }
 
-export { registerMonitor, getMonitors, getMonitorById };
+async function deleteMonitorById(req, res) {
+    const monitor = await deleteMonitor(req.params.id, req.user.id)
+    if (!monitor) {
+        return res.status(404).json({ error: "Monitor não encontrado" });
+    }
+    res.status(200).json(monitor)
+}
+
+export { registerMonitor, getMonitors, getMonitorById, deleteMonitorById };

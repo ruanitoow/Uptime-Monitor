@@ -48,7 +48,7 @@ function withMonitors(monitors) {
 
       <div className={style.monitorGrid}>
         {monitors.map((monitor) => {
-          const isOnline = monitor.status === "UP" || monitor.active === true;
+          const isOnline = monitor.status === "UP";
 
           return (
             <article key={monitor.id} className={style.monitorCard}>

@@ -1,5 +1,23 @@
 import prisma from "../libs/prisma.js";
 
+function calculateMetrics(checks) {
+  let upCount = 0;
+  let totalLatency = 0;
+  const totalChecks = checks.length;
+
+  checks.forEach((check) => {
+    if (check.status === "UP") {
+      upCount++;
+    }
+    totalLatency += check.latency ?? 0;
+  });
+
+  const uptimePercentage =
+    totalChecks > 0 ? Number((upCount / totalChecks) * 100.0).toFixed(2) : null;
+  const avgLatency = totalChecks > 0 ? totalLatency / totalChecks : null;
+  return { uptimePercentage, avgLatency };
+}
+
 async function createMonitor(body, userIdentify) {
   const { name, type, host, port, path } = body;
   const userId = userIdentify;
@@ -12,21 +30,32 @@ async function createMonitor(body, userIdentify) {
 }
 
 async function collectMonitors(userIdentify) {
+  const startDate = new Date(Date.now() - 24 * 60 * 60 * 1000);
   const monitors = await prisma.monitor.findMany({
     where: { userId: userIdentify },
     include: {
       checks: {
-        take: 1,
-        orderBy: { checkedAt: "desc" },
+        where: {
+          checkedAt: {
+            gte: startDate,
+          },
+        },
+        orderBy: {
+          checkedAt: "desc",
+        },
       },
     },
   });
 
-  return monitors.map((monitor) => ({
-    ...monitor,
-    status: monitor.checks[0]?.status ?? "DOWN",
-    latency: monitor.checks[0]?.latency ?? null,
-  }));
+  return monitors.map((monitor) => {
+    const metrics = calculateMetrics(monitor.checks);
+    return {
+      ...monitor,
+      ...metrics,
+      status: monitor.checks[0]?.status ?? "DOWN",
+      latency: monitor.checks[0]?.latency ?? null,
+    };
+  });
 }
 
 async function collectMonitorsById(params, userIdentify, period) {
@@ -72,23 +101,8 @@ async function collectMonitorsById(params, userIdentify, period) {
     },
   });
   if (!monitor) return null;
-
-  let upCount = 0;
-  let totalLatency = 0;
-  const totalChecks = monitor.checks.length;
-
-  monitor.checks.forEach((check) => {
-    if (check.status === "UP") {
-      upCount++;
-    }
-    totalLatency += check.latency ?? 0;
-  });
-
-  const uptimePercentage =
-    totalChecks > 0 ? Number((upCount / totalChecks) * 100.0).toFixed(2) : null;
-  const avgLatency = totalChecks > 0 ? totalLatency / totalChecks : null;
-
-  return { ...monitor, avgLatency, uptimePercentage };
+  const metrics = calculateMetrics(monitor.checks);
+  return { ...monitor, ...metrics };
 }
 
 async function deleteMonitor(params, userIdentify) {
@@ -98,9 +112,6 @@ async function deleteMonitor(params, userIdentify) {
     where: { id, userId: userIdentify },
   });
   if (!monitor) return null;
-  await prisma.check.deleteMany({
-    where: { monitorId: id },
-  });
   await prisma.monitor.delete({
     where: { id },
   });

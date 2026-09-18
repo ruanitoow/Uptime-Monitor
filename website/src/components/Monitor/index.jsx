@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Link } from "react-router-dom";
 import style from "./monitor.module.css";
 
 const backendURL = import.meta.env.VITE_BACKEND_URL;
@@ -60,13 +61,19 @@ function MonitorCard({ monitor, monitors, setMonitor }) {
       <div className={style.monitorStats}>
         <div className={style.stat}>
           <span>Uptime</span>
-          <strong>{monitor.uptime ?? "—"}</strong>
+          <strong>
+            {monitor.uptimePercentage != null
+              ? `${Number(monitor.uptimePercentage).toFixed(2)}%`
+              : "-"}
+          </strong>
         </div>
 
         <div className={style.stat}>
           <span>Latência</span>
           <strong>
-            {monitor.latency != null ? `${monitor.latency} ms` : "—"}
+            {monitor.avgLatency != null
+              ? `${monitor.avgLatency.toFixed(2)} ms`
+              : "—"}
           </strong>
         </div>
 
@@ -94,7 +101,9 @@ function MonitorCard({ monitor, monitors, setMonitor }) {
 
           {isMenuOpen && (
             <div className={style.menu}>
-              <button className={style.menuItem}>Ver detalhes</button>
+              <Link to={`/monitors/${monitor.id}`} className={style.menuItem}>
+                Ver detalhes
+              </Link>
 
               <button className={style.menuItem}>Editar</button>
 

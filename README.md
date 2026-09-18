@@ -29,7 +29,7 @@ O fluxo de autenticação via cookies (HTTPOnly) está estabelecido, e a comunic
 - **Tipos de Monitoramento:** Suporte para HTTP, HTTPS e TCP.
 - **Worker de Checagem (Backend):** Execução em background para aferir latência, status e `statusCode` dos monitores ativos, aguardando 5 segundos entre os ciclos de checagem.
 - **Dashboard (Frontend):** Interface de visualização da lista de monitores e seus status mais recentes.
-- **Página de Detalhes do Monitor (Frontend):** Visualização individual com métricas calculadas (uptime %, latência média), alternância de período (24h, 7d, 30d) e tabela de histórico.
+- **Página de Detalhes do Monitor (Frontend):** Visualização individual com métricas calculadas (uptime %, latência média), alternância de período (24h, 7d, 30d), gráfico de latência temporal interativo via Recharts e tabela de histórico.
 - **Camada de Proteção:** Proteção de rotas do backend usando middlewares de validação e restrição de acesso a recursos apenas pelo dono (Usuário).
 - **API de Detalhes e Deleção (Backend):** Endpoints para buscar histórico detalhado e excluir monitores, com deleção em cascata (`onDelete: Cascade`) no banco de dados.
 
@@ -42,7 +42,6 @@ O fluxo de autenticação via cookies (HTTPOnly) está estabelecido, e a comunic
 
 - **Sistema de Incidentes:** Abertura e fechamento de incidentes quando um serviço cai.
 - **Notificações:** Alertas via Webhook, Discord, Email, etc.
-- **Métricas Avançadas:** Gráficos (Recharts) detalhando histórico, cálculo de uptime % e latência média.
 - **Paginação/Limitação de Checagens no Frontend:** Lidar visualmente com um longo histórico.
 
 ---
@@ -219,7 +218,7 @@ O cronograma e planejamento do projeto baseiam-se nos desenvolvimentos e testes 
 ### 🟡 MVP 3: Dashboard e Métricas Avançadas
 
 - [x] Cálculo real de Uptime % e Latência Média por período no backend (`24h`, `7d`, `30d`).
-- [ ] Integração do Recharts para gráficos de tempo de resposta.
+- [x] Integração do Recharts para gráficos de tempo de resposta.
 - [ ] Paginação do Histórico.
 
 ### ⬜ MVP 4: Incidentes e Notificações

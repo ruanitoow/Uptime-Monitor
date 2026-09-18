@@ -1,5 +1,14 @@
 import { useState, useEffect } from "react";
 import { Link, useParams } from "react-router-dom";
+import {
+  ResponsiveContainer,
+  LineChart,
+  Line,
+  XAxis,
+  YAxis,
+  Tooltip,
+  CartesianGrid,
+} from "recharts";
 import DashboardLayout from "../../layouts/DashboardLayout";
 import style from "./details.module.css";
 
@@ -39,6 +48,18 @@ function MonitorDetailsPage() {
 
     loadMonitorData();
   }, [id, period]);
+
+  const chartData = (monitor?.checks ?? [])
+    .slice(0, 30)
+    .slice()
+    .reverse()
+    .map((check) => ({
+      time: new Date(check.checkedAt).toLocaleTimeString([], {
+        hour: "2-digit",
+        minute: "2-digit",
+      }),
+      latency: check.latency ?? 0,
+    }));
 
   const isOnline = monitor?.checks?.[0]?.status === "UP";
 
@@ -149,8 +170,42 @@ function MonitorDetailsPage() {
             <h3 className={style.sectionTitle}>Histórico de Latência (ms)</h3>
           </div>
           <div className={style.chartContainer}>
-            {/* O componente Recharts LineChart será plugado aqui */}
-            <span>Gráfico de Latência (Recharts)</span>
+            {chartData.length > 0 ? (
+              <ResponsiveContainer width="100%" height={260}>
+                <LineChart
+                  data={chartData}
+                  margin={{ top: 10, right: 15, left: -20, bottom: 0 }}
+                >
+                  <CartesianGrid strokeDasharray="3 3" stroke="#262626" />
+                  <XAxis dataKey="time" stroke="#888" tick={{ fontSize: 11 }} />
+                  <YAxis stroke="#888" tick={{ fontSize: 11 }} unit="ms" />
+                  <Tooltip
+                    contentStyle={{
+                      backgroundColor: "#171717",
+                      border: "1px solid #333",
+                      borderRadius: "8px",
+                      color: "#fff",
+                      fontSize: "12px",
+                    }}
+                    itemStyle={{ color: "#818cf8" }}
+                  />
+                  <Line
+                    type="monotone"
+                    dataKey="latency"
+                    stroke="#6366f1"
+                    strokeWidth={2}
+                    dot={false}
+                    activeDot={{ r: 5, fill: "#818cf8" }}
+                  />
+                </LineChart>
+              </ResponsiveContainer>
+            ) : (
+              <span
+                style={{ color: "var(--text-secondary)", fontSize: "0.9rem" }}
+              >
+                Sem dados de latência suficientes no momento.
+              </span>
+            )}
           </div>
         </section>
 

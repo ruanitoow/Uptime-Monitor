@@ -19,8 +19,11 @@ function MonitorDetailsPage() {
   const [period, setPeriod] = useState("24h");
   const [monitor, setMonitor] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [currentPage, setCurrentPage] = useState(1);
+  const ITEMS_PER_PAGE = 15;
 
   useEffect(() => {
+    setCurrentPage(1);
     async function loadMonitorData() {
       try {
         const detailsMonitor = await fetch(
@@ -60,6 +63,14 @@ function MonitorDetailsPage() {
       }),
       latency: check.latency ?? 0,
     }));
+
+  const allChecks = monitor?.checks ?? [];
+  const totalPages = Math.max(1, Math.ceil(allChecks.length / ITEMS_PER_PAGE));
+  const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
+  const currentChecks = allChecks.slice(
+    startIndex,
+    startIndex + ITEMS_PER_PAGE,
+  );
 
   const isOnline = monitor?.checks?.[0]?.status === "UP";
 
@@ -223,8 +234,8 @@ function MonitorDetailsPage() {
                 </tr>
               </thead>
               <tbody>
-                {monitor?.checks && monitor.checks.length > 0 ? (
-                  monitor.checks.slice(0, 20).map((check) => (
+                {currentChecks.length > 0 ? (
+                  currentChecks.map((check) => (
                     <tr key={check.id}>
                       <td>
                         {new Date(check.checkedAt).toLocaleString("pt-BR")}
@@ -254,6 +265,41 @@ function MonitorDetailsPage() {
               </tbody>
             </table>
           </div>
+
+          {allChecks.length > ITEMS_PER_PAGE && (
+            <div className={style.paginationContainer}>
+              <span className={style.paginationInfo}>
+                Mostrando {startIndex + 1} –{" "}
+                {Math.min(startIndex + ITEMS_PER_PAGE, allChecks.length)} de{" "}
+                {allChecks.length} verificações
+              </span>
+              <div className={style.paginationControls}>
+                <button
+                  type="button"
+                  className={style.paginationButton}
+                  onClick={() =>
+                    setCurrentPage((prev) => Math.max(prev - 1, 1))
+                  }
+                  disabled={currentPage === 1}
+                >
+                  ← Anterior
+                </button>
+                <span className={style.paginationCurrent}>
+                  Página {currentPage} de {totalPages}
+                </span>
+                <button
+                  type="button"
+                  className={style.paginationButton}
+                  onClick={() =>
+                    setCurrentPage((prev) => Math.min(prev + 1, totalPages))
+                  }
+                  disabled={currentPage >= totalPages}
+                >
+                  Próxima →
+                </button>
+              </div>
+            </div>
+          )}
         </section>
       </div>
     </DashboardLayout>

@@ -1,5 +1,6 @@
-import { useState } from "react";
+import { useContext, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { UserContext } from "../../contexts/user.context";
 import AuthForm from "../../components/Auth/AuthForm";
 import AuthShell from "../../components/Auth/AuthShell";
 import Popup from "../../components/Popup";
@@ -23,6 +24,7 @@ const loginFields = [
 
 function LoginPage() {
   const navigate = useNavigate();
+  const { getUserData } = useContext(UserContext);
   const [popup, setPopup] = useState({
     open: false,
     variant: "error",
@@ -67,6 +69,7 @@ function LoginPage() {
         });
         return;
     }
+    await getUserData();
     navigate("/dashboard")
   }
   return (

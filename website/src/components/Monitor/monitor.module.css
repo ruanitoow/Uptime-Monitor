@@ -1,0 +1,361 @@
+.monitorCard {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  padding: 1.25rem;
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  background: var(--surface);
+  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.05);
+  transition:
+    box-shadow 0.18s ease,
+    border-color 0.18s ease;
+}
+
+.monitorCard:hover {
+  border-color: var(--border-strong);
+  box-shadow: 0 14px 30px rgba(15, 23, 42, 0.08);
+}
+
+.monitorHeader {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  min-width: 0;
+}
+
+.monitorType {
+  display: inline-block;
+  margin-bottom: 0.35rem;
+  color: var(--primary);
+  font-size: 0.7rem;
+  font-weight: 750;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.monitorHeader h2 {
+  margin: 0;
+  overflow: hidden;
+  color: var(--text-primary);
+  font-size: 1.05rem;
+  font-weight: 720;
+  line-height: 1.3;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.monitorHost {
+  display: block;
+  margin-top: 0.35rem;
+  overflow: hidden;
+  color: var(--text-muted);
+  font-size: 0.78rem;
+  line-height: 1.4;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.statusBadge {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.4rem 0.65rem;
+  border-radius: 999px;
+  font-size: 0.72rem;
+  font-weight: 700;
+}
+
+.statusOnline {
+  color: var(--success);
+  background: color-mix(in srgb, var(--success) 10%, transparent);
+}
+
+.statusOffline {
+  color: var(--danger);
+  background: color-mix(in srgb, var(--danger) 10%, transparent);
+}
+
+.statusDot {
+  width: 7px;
+  height: 7px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  background: currentColor;
+}
+
+.monitorDivider {
+  width: 100%;
+  height: 1px;
+  margin: 1.1rem 0;
+  background: var(--border);
+}
+
+.monitorStats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.75rem;
+}
+
+.stat {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  min-width: 0;
+}
+
+.stat span {
+  color: var(--text-muted);
+  font-size: 0.72rem;
+  font-weight: 600;
+}
+
+.stat strong {
+  overflow: hidden;
+  color: var(--text-primary);
+  font-size: 0.95rem;
+  font-weight: 720;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.monitorFooter {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-top: 1.2rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--border);
+}
+
+.monitorFooter > span {
+  min-width: 0;
+  overflow: hidden;
+  color: var(--text-muted);
+  font-size: 0.7rem;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.monitorAction {
+  padding: 0;
+  border: 0;
+  color: var(--primary);
+  background: transparent;
+  font: inherit;
+  font-size: 0.75rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition:
+    color 0.16s ease,
+    transform 0.16s ease;
+}
+
+.monitorAction:hover {
+  color: var(--primary-hover);
+  transform: translateX(1px);
+}
+
+.monitorAction:focus-visible {
+  outline: none;
+  border-radius: 4px;
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--primary) 14%, transparent);
+}
+
+.menuContainer {
+  position: relative;
+  display: inline-flex;
+  flex-shrink: 0;
+}
+
+.menuButton {
+  width: 40px;
+  height: 40px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border: 1px solid var(--border-strong);
+  border-radius: 11px;
+  color: var(--text-secondary);
+  background: var(--surface);
+  font-family: inherit;
+  font-size: 1.25rem;
+  font-weight: 700;
+  line-height: 1;
+  cursor: pointer;
+  box-shadow: var(--shadow-sm);
+  transition:
+    transform 0.2s ease,
+    background 0.2s ease,
+    border-color 0.2s ease,
+    color 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.menuButton:hover {
+  transform: translateY(-2px);
+  color: var(--text-primary);
+  background: var(--surface-secondary);
+  border-color: var(--border-strong);
+  box-shadow: var(--shadow-sm);
+}
+
+.menuButton:active {
+  transform: translateY(0);
+}
+
+.menuButton:focus-visible {
+  outline: 3px solid rgba(99, 102, 241, 0.25);
+  outline-offset: 3px;
+}
+
+.menu {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  z-index: 100;
+  width: max-content;
+  min-width: 180px;
+  max-width: min(220px, calc(100vw - 2rem));
+  padding: 0.4rem;
+  overflow: hidden;
+  border: 1px solid var(--border-strong);
+  border-radius: 11px;
+  background: var(--surface);
+  box-shadow: 0 12px 30px rgba(15, 23, 42, 0.12);
+  animation: menuAppear 0.15s ease-out;
+}
+
+.menuItem {
+  width: 100%;
+  min-height: 40px;
+  display: flex;
+  align-items: center;
+  padding: 0.65rem 0.8rem;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  color: var(--text-secondary);
+  background: transparent;
+  font-family: inherit;
+  font-size: 0.9rem;
+  font-weight: 600;
+  text-align: left;
+  text-decoration: none;
+  cursor: pointer;
+  transition:
+    transform 0.2s ease,
+    background 0.2s ease,
+    border-color 0.2s ease,
+    color 0.2s ease;
+}
+
+.menuItem:hover {
+  transform: translateY(-2px);
+  color: var(--primary);
+  background: var(--surface-secondary);
+  border-color: var(--border-strong);
+}
+
+.menuItem:active {
+  transform: translateY(0);
+}
+
+.menuItem:focus-visible {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--primary) 14%, transparent);
+}
+
+.menuItem.delete {
+  color: var(--danger);
+}
+
+.menuItem.delete:hover {
+  color: var(--danger);
+  background: color-mix(in srgb, var(--danger) 8%, transparent);
+  border-color: color-mix(in srgb, var(--danger) 25%, transparent);
+}
+
+@keyframes menuAppear {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (max-width: 900px) {
+  .monitorGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 560px) {
+  .monitorCard {
+    padding: 1rem;
+  }
+
+  .monitorHeader {
+    gap: 0.75rem;
+  }
+
+  .monitorHeader h2 {
+    font-size: 1rem;
+  }
+
+  .statusBadge {
+    align-self: flex-start;
+  }
+
+  .monitorStats {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .monitorFooter {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .menuButton {
+    width: 38px;
+    height: 38px;
+    font-size: 1.15rem;
+  }
+
+  .menu {
+    right: 0;
+    min-width: 165px;
+  }
+}
+
+@media (max-width: 380px) {
+  .monitorCard {
+    padding: 0.85rem;
+  }
+
+  .monitorHeader {
+    gap: 0.5rem;
+  }
+
+  .monitorStats {
+    grid-template-columns: 1fr 1fr;
+    gap: 0.6rem;
+  }
+
+  .menuButton {
+    width: 36px;
+    height: 36px;
+  }
+
+  .menu {
+    min-width: 155px;
+  }
+}

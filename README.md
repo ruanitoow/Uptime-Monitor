@@ -136,12 +136,13 @@ Endpoints principais do backend atualmente:
 **Autenticação e Usuário**
 * `POST /register`: Cria nova conta.
 * `POST /login`: Autentica usuário e retorna cookie HTTPOnly.
+* `POST /user/logout`: Encerra a sessão limpando o cookie de autenticação.
 * `GET /user/data`: Retorna os dados do usuário logado baseado no cookie.
 
 **Monitores**
 * `POST /monitors`: Cadastra um monitor.
 * `GET /monitors`: Lista todos os monitores do usuário logado (trazendo o último Check).
-* `GET /monitors/:id`: Traz detalhes do monitor e os últimos 50 Checks.
+* `GET /monitors/:id?period=24h|7d|30d`: Traz detalhes do monitor, checks filtrados pelo período e métricas calculadas (`uptimePercentage` e `avgLatency`).
 * `DELETE /monitors/:id`: Deleta monitor e suas checagens associadas.
 
 ---
@@ -204,14 +205,14 @@ O cronograma e planejamento do projeto baseiam-se nos desenvolvimentos e testes 
 - [x] Worker para checagem assíncrona.
 - [x] Tipos de check: HTTP, HTTPS, TCP.
 - [x] Registro de status e latência.
-- [ ] Remoção de monitores via Frontend.
+- [x] Remoção de monitores via Frontend.
 - [ ] Visualização detalhada (Página de Detalhes no Frontend).
-- [ ] Apresentação inicial do histórico das últimas 50 requisições (API já pronta).
+- [x] Apresentação do histórico filtrado por período e métricas calculadas na API.
 
-### ⬜ MVP 3: Dashboard e Métricas Avançadas
+### 🟡 MVP 3: Dashboard e Métricas Avançadas
 
+- [x] Cálculo real de Uptime % e Latência Média por período no backend (`24h`, `7d`, `30d`).
 - [ ] Integração do Recharts para gráficos de tempo de resposta.
-- [ ] Cálculo real de Uptime % mensal/semanal.
 - [ ] Paginação do Histórico.
 
 ### ⬜ MVP 4: Incidentes e Notificações
@@ -225,6 +226,5 @@ O cronograma e planejamento do projeto baseiam-se nos desenvolvimentos e testes 
 ## 🚫 Limitações atuais
 
 * O worker aguarda 5 segundos após concluir um ciclo de checagem antes de iniciar o próximo; o intervalo ainda não é configurável por monitor.
-* Front-end ainda não possui interface para exclusão de monitores (embora o endpoint de deleção exista no backend). A funcionalidade de edição de monitores ainda não foi implementada na API nem na interface.
+* A funcionalidade de edição de monitores ainda não foi implementada na API nem na interface.
 * Embora existam timeouts configurados internamente no backend, ainda não é possível personalizá-los via UI.
-* A sessão do lado do cliente dura enquanto o cookie persistir, mas o logout explicitamente apenas limpa a UI e não quebra a validade do cookie no lado do servidor (falta `POST /logout` no backend).

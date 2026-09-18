@@ -14,7 +14,11 @@ function Action(props) {
   const variantClass = variants[props.variant] ?? style.primary;
 
   return (
-    <Link className={`${style.action} ${variantClass}`} to={props.url} onClick={props.onClick}>
+    <Link
+      className={`${style.action} ${variantClass}`}
+      to={props.url}
+      onClick={props.onClick}
+    >
       {props.img && <img src={props.img} alt={props.alt ?? ""} />}
       {props.name}
     </Link>

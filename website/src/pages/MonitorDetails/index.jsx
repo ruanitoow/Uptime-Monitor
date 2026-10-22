@@ -1,0 +1,309 @@
+import { useState, useEffect } from "react";
+import { Link, useParams } from "react-router-dom";
+import {
+  ResponsiveContainer,
+  LineChart,
+  Line,
+  XAxis,
+  YAxis,
+  Tooltip,
+  CartesianGrid,
+} from "recharts";
+import DashboardLayout from "../../layouts/DashboardLayout";
+import style from "./details.module.css";
+
+const backendURL = import.meta.env.VITE_BACKEND_URL;
+
+function MonitorDetailsPage() {
+  const { id } = useParams();
+  const [period, setPeriod] = useState("24h");
+  const [monitor, setMonitor] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [currentPage, setCurrentPage] = useState(1);
+  const ITEMS_PER_PAGE = 15;
+
+  useEffect(() => {
+    setCurrentPage(1);
+    async function loadMonitorData() {
+      try {
+        const detailsMonitor = await fetch(
+          `${backendURL}/monitors/${id}?period=${period}`,
+          {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            credentials: "include",
+          },
+        );
+        if (detailsMonitor.ok) {
+          const data = await detailsMonitor.json();
+          setMonitor(data);
+        } else {
+          console.error("Falha ao carregar monitor:", detailsMonitor.status);
+        }
+      } catch (err) {
+        console.log(`Erro ao pegar monitor. Erro: ${err}`);
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    loadMonitorData();
+  }, [id, period]);
+
+  const chartData = (monitor?.checks ?? [])
+    .slice(0, 30)
+    .slice()
+    .reverse()
+    .map((check) => ({
+      time: new Date(check.checkedAt).toLocaleTimeString([], {
+        hour: "2-digit",
+        minute: "2-digit",
+      }),
+      latency: check.latency ?? 0,
+    }));
+
+  const allChecks = monitor?.checks ?? [];
+  const totalPages = Math.max(1, Math.ceil(allChecks.length / ITEMS_PER_PAGE));
+  const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
+  const currentChecks = allChecks.slice(
+    startIndex,
+    startIndex + ITEMS_PER_PAGE,
+  );
+
+  const isOnline = monitor?.checks?.[0]?.status === "UP";
+
+  return (
+    <DashboardLayout>
+      <div className={style.container}>
+        {/* Voltar para a Dashboard */}
+        <Link to="/dashboard" className={style.backLink}>
+          ← Voltar para todos os monitores
+        </Link>
+
+        {/* Cabeçalho do Monitor */}
+        <header className={style.header}>
+          <div className={style.headerInfo}>
+            <span className={style.typeBadge}>{monitor?.type ?? "HTTP"}</span>
+            <h1 className={style.title}>{monitor?.name ?? "Carregando..."}</h1>
+            <span className={style.host}>
+              {monitor?.host}
+              {monitor?.port ? `:${monitor.port}` : ""}
+              {monitor?.path ? `/${monitor.path}` : ""}
+            </span>
+          </div>
+
+          <div
+            className={`${style.statusBadge} ${
+              isOnline ? style.statusOnline : style.statusOffline
+            }`}
+          >
+            <span className={style.statusDot}></span>
+            {isOnline ? "Operando" : "Indisponível"}
+          </div>
+        </header>
+
+        {/* Barra de Filtro de Período */}
+        <div className={style.periodControls}>
+          <h3>Métricas de Desempenho</h3>
+          <div className={style.buttonGroup}>
+            <button
+              type="button"
+              className={`${style.periodButton} ${
+                period === "24h" ? style.periodButtonActive : ""
+              }`}
+              onClick={() => setPeriod("24h")}
+            >
+              24 Horas
+            </button>
+            <button
+              type="button"
+              className={`${style.periodButton} ${
+                period === "7d" ? style.periodButtonActive : ""
+              }`}
+              onClick={() => setPeriod("7d")}
+            >
+              7 Dias
+            </button>
+            <button
+              type="button"
+              className={`${style.periodButton} ${
+                period === "30d" ? style.periodButtonActive : ""
+              }`}
+              onClick={() => setPeriod("30d")}
+            >
+              30 Dias
+            </button>
+          </div>
+        </div>
+
+        {/* Cards com as Métricas Calculadas */}
+        <div className={style.statsGrid}>
+          <div className={style.statCard}>
+            <span className={style.statLabel}>Uptime ({period})</span>
+            <strong className={style.statValue}>
+              {monitor?.uptimePercentage != null
+                ? `${Number(monitor.uptimePercentage).toFixed(2)}%`
+                : "—"}
+            </strong>
+          </div>
+
+          <div className={style.statCard}>
+            <span className={style.statLabel}>Latência Média</span>
+            <strong className={style.statValue}>
+              {monitor?.avgLatency != null
+                ? `${Number(monitor.avgLatency).toFixed(2)} ms`
+                : "—"}
+            </strong>
+          </div>
+
+          <div className={style.statCard}>
+            <span className={style.statLabel}>Verificações no Período</span>
+            <strong className={style.statValue}>
+              {monitor?.checks?.length ?? 0}
+            </strong>
+          </div>
+
+          <div className={style.statCard}>
+            <span className={style.statLabel}>Última Latência</span>
+            <strong className={style.statValue}>
+              {monitor?.checks?.[0]?.latency != null
+                ? `${monitor.checks[0].latency} ms`
+                : "—"}
+            </strong>
+          </div>
+        </div>
+
+        {/* Seção do Gráfico (Aqui vai entrar o Recharts!) */}
+        <section className={style.chartSection}>
+          <div className={style.sectionHeader}>
+            <h3 className={style.sectionTitle}>Histórico de Latência (ms)</h3>
+          </div>
+          <div className={style.chartContainer}>
+            {chartData.length > 0 ? (
+              <ResponsiveContainer width="100%" height={260}>
+                <LineChart
+                  data={chartData}
+                  margin={{ top: 10, right: 15, left: -20, bottom: 0 }}
+                >
+                  <CartesianGrid strokeDasharray="3 3" stroke="#262626" />
+                  <XAxis dataKey="time" stroke="#888" tick={{ fontSize: 11 }} />
+                  <YAxis stroke="#888" tick={{ fontSize: 11 }} unit="ms" />
+                  <Tooltip
+                    contentStyle={{
+                      backgroundColor: "#171717",
+                      border: "1px solid #333",
+                      borderRadius: "8px",
+                      color: "#fff",
+                      fontSize: "12px",
+                    }}
+                    itemStyle={{ color: "#818cf8" }}
+                  />
+                  <Line
+                    type="monotone"
+                    dataKey="latency"
+                    stroke="#6366f1"
+                    strokeWidth={2}
+                    dot={false}
+                    activeDot={{ r: 5, fill: "#818cf8" }}
+                  />
+                </LineChart>
+              </ResponsiveContainer>
+            ) : (
+              <span
+                style={{ color: "var(--text-secondary)", fontSize: "0.9rem" }}
+              >
+                Sem dados de latência suficientes no momento.
+              </span>
+            )}
+          </div>
+        </section>
+
+        {/* Tabela com os Checks Recentes */}
+        <section className={style.tableSection}>
+          <h3 className={style.sectionTitle}>Histórico de Verificações</h3>
+          <div className={style.tableWrapper}>
+            <table className={style.table}>
+              <thead>
+                <tr>
+                  <th>Data e Hora</th>
+                  <th>Status</th>
+                  <th>Código HTTP</th>
+                  <th>Latência</th>
+                </tr>
+              </thead>
+              <tbody>
+                {currentChecks.length > 0 ? (
+                  currentChecks.map((check) => (
+                    <tr key={check.id}>
+                      <td>
+                        {new Date(check.checkedAt).toLocaleString("pt-BR")}
+                      </td>
+                      <td>
+                        <span
+                          className={`${style.badge} ${
+                            check.status === "UP"
+                              ? style.badgeUp
+                              : style.badgeDown
+                          }`}
+                        >
+                          {check.status}
+                        </span>
+                      </td>
+                      <td>{check.statusCode ?? "—"}</td>
+                      <td>{check.latency} ms</td>
+                    </tr>
+                  ))
+                ) : (
+                  <tr>
+                    <td colSpan="4" className={style.emptyChecks}>
+                      Nenhum check registrado para este período.
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+          </div>
+
+          {allChecks.length > ITEMS_PER_PAGE && (
+            <div className={style.paginationContainer}>
+              <span className={style.paginationInfo}>
+                Mostrando {startIndex + 1} –{" "}
+                {Math.min(startIndex + ITEMS_PER_PAGE, allChecks.length)} de{" "}
+                {allChecks.length} verificações
+              </span>
+              <div className={style.paginationControls}>
+                <button
+                  type="button"
+                  className={style.paginationButton}
+                  onClick={() =>
+                    setCurrentPage((prev) => Math.max(prev - 1, 1))
+                  }
+                  disabled={currentPage === 1}
+                >
+                  ← Anterior
+                </button>
+                <span className={style.paginationCurrent}>
+                  Página {currentPage} de {totalPages}
+                </span>
+                <button
+                  type="button"
+                  className={style.paginationButton}
+                  onClick={() =>
+                    setCurrentPage((prev) => Math.min(prev + 1, totalPages))
+                  }
+                  disabled={currentPage >= totalPages}
+                >
+                  Próxima →
+                </button>
+              </div>
+            </div>
+          )}
+        </section>
+      </div>
+    </DashboardLayout>
+  );
+}
+
+export default MonitorDetailsPage;

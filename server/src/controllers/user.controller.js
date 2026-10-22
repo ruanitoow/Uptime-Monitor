@@ -12,4 +12,13 @@ userControl.data = (req, res) => {
     }
 }
 
+userControl.logout = (req, res) =>{
+    const data = req.user;
+    if(data)    {
+        res.status(200).clearCookie("token").json({ message: "User logout"})
+    } else {
+        res.status(403).json({message: "Error"});
+    }
+}
+
 export { userControl }

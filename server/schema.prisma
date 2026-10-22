@@ -48,6 +48,6 @@ model Check {
   statusCode Int?
   latency    Int
   checkedAt  DateTime @default(now())
-  monitor    Monitor     @relation(fields: [monitorId], references: [id])
+  monitor    Monitor     @relation(fields: [monitorId], references: [id], onDelete: Cascade)
   monitorId  Int
 }

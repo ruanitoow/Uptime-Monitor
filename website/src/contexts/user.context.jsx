@@ -10,34 +10,50 @@ const defaultUserData = {
 
 function UserProvider({ children }) {
     const [user, setUserData] = useState(defaultUserData);
+    const [terminated, setTerminated] = useState(false);
 
-    function deleteUser() {
-        setUserData(defaultUserData);
+    async function deleteUser() {
+        try {
+            const removeToken = await fetch(`${import.meta.env.VITE_BACKEND_URL}/user/logout`, {
+                method: 'POST',
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                credentials: "include"
+            })
+            if (removeToken.ok) {
+                return removeToken.message;
+            }
+        } catch (err) {
+            console.log(err);
+        } finally {
+            setUserData(defaultUserData);
+        }
+    }
+
+    async function getUserData() {
+        try {
+            const response = await fetch(`${backendURL}/user/data`, {
+                method: "GET",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                credentials: "include"
+            });
+
+            if (!response.ok) {
+                throw new Error(`HTTP error! Status: ${response.status}`);
+            }
+            const data = await response.json();
+            setUserData(data.name ? data : defaultUserData);
+        } catch (err) {
+            deleteUser()
+        } finally {
+            setTerminated(true);
+        }
     }
 
     useEffect(() => {
-        async function getUserData() {
-            try {
-                const response = await fetch(`${backendURL}/user/data`, {
-                    method: "GET",
-                    headers: {
-                        "Content-Type": "application/json"
-                    },
-                    credentials: "include"
-                });
-
-                if (!response.ok) {
-                    throw new Error(`HTTP error! Status: ${response.status}`);
-                }
-
-                const data = await response.json();
-
-                setUserData(data.name ? data : defaultUserData);
-            } catch (err) {
-                deleteUser()
-            }
-        }
-
         getUserData()
     }, []);
 
@@ -46,7 +62,9 @@ function UserProvider({ children }) {
             value={{
                 user,
                 setUserData,
-                deleteUser
+                getUserData,
+                deleteUser,
+                terminated
             }}
         >
             {children}

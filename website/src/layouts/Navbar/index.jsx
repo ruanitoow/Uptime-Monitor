@@ -1,9 +1,10 @@
-import { useState } from "react";
+import { useContext, useState } from "react";
 import Action from "../../components/Buttons/Actions";
 import Brand from "../../components/Brand";
 import ContainerFluid from "../../components/Containers/ContainerFluid";
 import ThemeToggle from "../../components/ThemeToggle";
 import style from "./navbar.module.css";
+import { UserContext } from "../../contexts/user.context";
 
 const navbarLinks = [
   { name: "Recursos", url: "#recursos" },
@@ -13,6 +14,8 @@ const navbarLinks = [
 
 function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false);
+  const { user, deleteUser } = useContext(UserContext);
+  const isAuthenticated = user && user.name !== "Not logged";
 
   function closeMenu() {
     setMenuOpen(false);
@@ -36,8 +39,8 @@ function Navbar() {
 
           <div className={style.desktopActions}>
             <ThemeToggle />
-            <Action name="Entrar" url="/login" variant="ghost" />
-            <Action name="Criar conta" url="/register" variant="primary" />
+            {isAuthenticated ? <Action name="Painel" url="/dashboard" variant="secondary" /> : <Action name="Entrar" url="/login" variant="secondary" />}
+            {isAuthenticated ? <Action name="Sair" url="" onClick={deleteUser} variant="primary" /> : <Action name="Registrar" url="/register" variant="primary" />}
           </div>
 
           <div className={style.mobileControls}>
@@ -69,8 +72,8 @@ function Navbar() {
             </div>
 
             <div className={style.mobileActions}>
-              <Action name="Entrar" url="/login" variant="secondary" />
-              <Action name="Criar conta" url="/register" variant="primary" />
+              {isAuthenticated ? <Action name="Painel" url="/dashboard" variant="secondary" /> : <Action name="Entrar" url="/login" variant="secondary" />}
+              {isAuthenticated ? <Action name="Sair" url="" onClick={deleteUser} variant="primary" /> : <Action name="Registrar" url="/register" variant="primary" />}
             </div>
           </div>
         </nav>
